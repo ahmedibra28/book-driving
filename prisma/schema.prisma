@@ -28,6 +28,8 @@ model User {
   lessons      Lesson[]
   transactions Transaction[]
 
+  instructor Instructor?
+
   @@map("users")
 }
 
@@ -85,6 +87,7 @@ model Lesson {
   fastTrackedDriveTest      Boolean
   lessonPreferences         LessonPreferences
   previousDrivingExperience PreviousDrivingExperience
+  status                    Status                    @default(ACTIVE)
   deposit                   Float                     @default(0)
   instructorPrice           Float                     @default(0)
   createdAt                 DateTime                  @default(now())
@@ -104,6 +107,38 @@ model Description {
   lessons     Lesson[]
 
   @@map("descriptions")
+}
+
+model Instructor {
+  id                      String          @id @default(dbgenerated("nanoid()")) @db.VarChar(21)
+  fullName                String
+  dateOfBirth             DateTime
+  contactNo               String
+  email                   String
+  address                 String
+  street                  String
+  city                    String
+  postalCode              String
+  drivingLicenseNo        String
+  licenseExpiryDate       DateTime
+  qualification           String
+  yearsOfExperience       Int
+  specialization          String?
+  vehicleRegistrationNo   String
+  vehicleModel            String
+  drivingLicenseFile      String
+  vehicleRegistrationFile String
+  proofOfInsurance        String
+  dbsCertificateFile      String
+  termAndCondition        Boolean
+  createdAt               DateTime        @default(now())
+  updatedAt               DateTime        @updatedAt
+  status                  InstuctorStatus @default(PENDING)
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Restrict)
+  userId String @unique
+
+  @@map("instructors")
 }
 
 model Student {
@@ -127,9 +162,10 @@ model Transaction {
   startDate          DateTime
   practicalTestDate  DateTime
   drivingExperience  DrivingExperience
-  refferedFrom       RefferedFrom
+  referredFrom       ReferredFrom
   discountCode       String
   amount             Float
+  status             Status            @default(ACTIVE)
 
   student      Student @relation(fields: [studentId], references: [id], onDelete: Restrict)
   studentId    String  @unique
@@ -141,7 +177,7 @@ model Transaction {
   @@map("transactions")
 }
 
-enum RefferedFrom {
+enum ReferredFrom {
   GOOGLE
   FACEBOOK
   INSTAGRAM
@@ -193,4 +229,16 @@ enum Method {
   POST
   PUT
   DELETE
+}
+
+enum InstuctorStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum Status {
+  ACTIVE
+  INACTIVE
+  DELETED
 }
