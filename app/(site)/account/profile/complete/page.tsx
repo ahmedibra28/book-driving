@@ -5,7 +5,6 @@ import React, { useEffect } from 'react'
 import dynamic from 'next/dynamic'
 import { useForm } from 'react-hook-form'
 
-import Image from 'next/image'
 import useApi from '@/hooks/useApi'
 import Message from '@/components/Message'
 import Spinner from '@/components/Spinner'
@@ -14,9 +13,17 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
 import { Form } from '@/components/ui/form'
 import CustomFormField, { FormButton, Upload } from '@/components/ui/CustomForm'
+import {
+  CardTitle,
+  CardDescription,
+  CardHeader,
+  CardContent,
+  Card,
+} from '@/components/ui/card'
+import { FaAnglesRight } from 'react-icons/fa6'
 
 const Profile = () => {
-  const [fileLink, setFileLink] = React.useState<string[]>([])
+  const [step, setStep] = React.useState(1)
 
   const path = useAuthorization()
   const router = useRouter()
@@ -37,76 +44,118 @@ const Profile = () => {
   const updateApi = useApi({
     key: ['profiles'],
     method: 'PUT',
-    url: `profile`,
+    url: `profile/complete`,
   })?.put
 
-  const FormSchema = z
-    .object({
-      name: z.string(),
+  const FormSchema = z.object({
+    ...(step === 1 && {
       address: z.string(),
-      mobile: z.number(),
-      bio: z.string(),
-      password: z.string().refine((val) => val.length === 0 || val.length > 6, {
-        message: "Password can't be less than 6 characters",
-      }),
-      confirmPassword: z
-        .string()
-        .refine((val) => val.length === 0 || val.length > 6, {
-          message: "Confirm password can't be less than 6 characters",
-        }),
-    })
-    .refine((data) => data.password === data.confirmPassword, {
-      message: 'Password do not match',
-      path: ['confirmPassword'],
-    })
+      fullName: z.string(),
+      dateOfBirth: z.string(),
+      contactNo: z.string(),
+      street: z.string(),
+      city: z.string(),
+      postalCode: z.string(),
+    }),
+    ...(step === 2 && {
+      drivingLicenseNo: z.string(),
+      licenseExpiryDate: z.string(),
+      qualification: z.string(),
+      yearsOfExperience: z.string(),
+      specialization: z.string(),
+      vehicleRegistrationNo: z.string(),
+      vehicleModel: z.string(),
+    }),
+    ...(step === 3 && {
+      drivingLicenseFile: z.array(z.string()),
+      vehicleRegistrationFile: z.array(z.string()),
+      proofOfInsuranceFile: z.array(z.string()),
+      dbsCertificateFile: z.array(z.string()),
+      termAndCondition: z.boolean().optional(),
+    }),
+    ...(step === 4 && {
+      address: z.string(),
+      fullName: z.string(),
+      dateOfBirth: z.string(),
+      contactNo: z.string(),
+      street: z.string(),
+      city: z.string(),
+      postalCode: z.string(),
+      drivingLicenseNo: z.string(),
+      licenseExpiryDate: z.string(),
+      qualification: z.string(),
+      yearsOfExperience: z.string(),
+      specialization: z.string(),
+      vehicleRegistrationNo: z.string(),
+      vehicleModel: z.string(),
+      drivingLicenseFile: z.array(z.string()),
+      vehicleRegistrationFile: z.array(z.string()),
+      proofOfInsuranceFile: z.array(z.string()),
+      dbsCertificateFile: z.array(z.string()),
+      termAndCondition: z.boolean().optional(),
+    }),
+  })
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
-    defaultValues: {
-      name: '',
-      address: '',
-      mobile: 0,
-      bio: '',
-      password: '',
-      confirmPassword: '',
-    },
   })
 
   function onSubmit(values: z.infer<typeof FormSchema>) {
+    console.log(values)
+    if (step < 4) return setStep(step + 1)
     updateApi?.mutateAsync({
       ...values,
-      id: getApi?.data?.id,
-      image: fileLink ? fileLink[0] : getApi?.data?.image,
+      id: userInfo.id,
     })
   }
 
   useEffect(() => {
     if (updateApi?.isSuccess) {
       getApi?.refetch()
-      const { name, mobile, email, image } = updateApi?.data
+      const { name, mobile, image } = updateApi?.data
       updateUserInfo({
         ...userInfo,
         name,
         mobile,
-        email,
         image,
       })
-      setFileLink([])
+      form.reset()
     }
     // eslint-disable-next-line
   }, [updateApi?.isSuccess])
 
-  useEffect(() => {
-    form.setValue('name', !getApi?.isPending ? getApi?.data?.name : '')
-    form.setValue('address', !getApi?.isPending ? getApi?.data?.address : '')
-    form.setValue('mobile', !getApi?.isPending ? getApi?.data?.mobile : '')
-    form.setValue('bio', !getApi?.isPending ? getApi?.data?.bio : '')
-    setFileLink(!getApi?.isPending ? [getApi?.data?.image] : [])
-    // eslint-disable-next-line
-  }, [getApi?.isPending, form.setValue])
+  const profile = getApi?.data
+
+  const stepper = ({
+    num,
+    label,
+    hideArrow = false,
+  }: {
+    num: number
+    label: string
+    hideArrow?: boolean
+  }) => (
+    <li
+      className={`flex items-center ${
+        step >= num ? 'text-green-500' : 'text-gray-500'
+      }`}
+    >
+      <span
+        className={`flex items-center justify-center w-5 h-5 me-2 text-xs border ${
+          step >= num ? 'border-green-500' : 'border-gray-500'
+        } rounded-full shrink-0 ${
+          step >= num ? 'text-green-500' : 'text-gray-500'
+        }`}
+      >
+        {num}
+      </span>
+      <span className='hidden md:flex'>{label}</span>
+      {!hideArrow && <FaAnglesRight className='text-sm ml-2' />}
+    </li>
+  )
 
   return (
-    <div className='max-w-6xl mx-auto bg-white p-3 mt-2'>
+    <div className='max-w-6xl mx-auto bg-whites p-3 mt-2'>
       {updateApi?.isError && <Message value={updateApi?.error} />}
 
       {getApi?.isError && <Message value={getApi?.error} />}
@@ -115,131 +164,462 @@ const Profile = () => {
       {getApi?.isPending && <Spinner />}
 
       <div className='bg-opacity-60 max-w-4xl mx-auto'>
-        <div className='text-3xl uppercase text-center'> {userInfo.name}</div>
-        <div className='text-center mb-10'>
-          <div className='bg-primary w-32 text-white rounded-full mx-auto'>
-            <span> {userInfo.role}</span>
-          </div>
-        </div>
+        <Card className='w-full mx-w-3xl lg:max-w-5xl mx-auto'>
+          {userInfo.role === 'INSTRUCTOR' &&
+            profile?.instructor?.status !== 'PENDING' && (
+              <CardHeader>
+                <CardTitle>Complete your account</CardTitle>
+                <CardDescription>
+                  Please fill out the form to complete your account.
+                </CardDescription>
 
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)}>
-            {getApi?.data?.image && (
-              <div className='avatar text-center flex justify-center'>
-                <div className='w-32'>
-                  <Image
-                    src={getApi?.data?.image}
-                    alt='avatar'
-                    width={100}
-                    height={100}
-                    style={{ objectFit: 'cover' }}
-                    className='rounded-full'
-                  />
-                </div>
-              </div>
+                <ol className='flex items-center justify-between w-full p-3 space-x-2 text-sm font-medium text-center text-gray-500 sm:text-base sm:p-4 sm:space-x-4 rtl:space-x-reverse border-b'>
+                  {stepper({
+                    num: 1,
+                    label: 'Personal',
+                  })}
+
+                  {stepper({
+                    num: 2,
+                    label: 'Driving',
+                  })}
+
+                  {stepper({
+                    num: 3,
+                    label: 'Documents',
+                  })}
+                  {stepper({
+                    num: 4,
+                    label: 'Summary',
+                    hideArrow: true,
+                  })}
+                </ol>
+              </CardHeader>
             )}
 
-            <div className='flex flex-row flex-wrap gap-2'>
-              <div className='w-full md:w-[48%] lg:w-[32%]'>
-                <CustomFormField
-                  form={form}
-                  name='name'
-                  label='Name'
-                  placeholder='Enter name'
-                  type='text'
-                />
-              </div>
-              <div className='w-full md:w-[48%] lg:w-[32%]'>
-                <CustomFormField
-                  form={form}
-                  name='address'
-                  label='Address'
-                  placeholder='Enter address'
-                  type='text'
-                />
-              </div>
+          <CardContent className='space-y-6 py-5'>
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit)}>
+                {userInfo.role === 'INSTRUCTOR' &&
+                  profile?.instructor?.status !== 'PENDING' && (
+                    <div>
+                      {step === 1 && (
+                        <>
+                          <CardTitle className='text-lg'>
+                            Personal Information
+                          </CardTitle>
+                          <div className='grid grid-col-1 md:grid-cols-2 lg:grid-cols-3 my-4 gap-y-1 gap-x-4'>
+                            <CustomFormField
+                              form={form}
+                              name='fullName'
+                              label='Name'
+                              placeholder='Enter name'
+                              type='text'
+                            />
+                            <CustomFormField
+                              form={form}
+                              name='dateOfBirth'
+                              label='Date of Birth'
+                              placeholder='Enter date of birth'
+                              type='date'
+                            />
+                            <CustomFormField
+                              form={form}
+                              name='contactNo'
+                              label='Mobile'
+                              placeholder='Enter mobile'
+                              type='number'
+                            />
+                            <CustomFormField
+                              form={form}
+                              name='address'
+                              label='Address'
+                              placeholder='Enter address'
+                              type='text'
+                            />
+                            <CustomFormField
+                              form={form}
+                              name='street'
+                              label='Street'
+                              placeholder='Enter street'
+                              type='text'
+                            />
+                            <CustomFormField
+                              form={form}
+                              name='city'
+                              label='City'
+                              placeholder='Enter city'
+                              type='text'
+                            />
+                            <CustomFormField
+                              form={form}
+                              name='postalCode'
+                              label='Postal Code'
+                              placeholder='Enter postal code'
+                              type='text'
+                            />
+                          </div>
+                        </>
+                      )}
 
-              <div className='w-full md:w-[48%] lg:w-[32%]'>
-                <CustomFormField
-                  form={form}
-                  name='mobile'
-                  label='Mobile'
-                  placeholder='Enter mobile'
-                  type='number'
-                  step='0.01'
-                />
-              </div>
+                      {step === 2 && (
+                        <>
+                          <CardTitle className='text-lg'>
+                            Driving Instructor Details
+                          </CardTitle>
+                          <div className='grid grid-col-1 md:grid-cols-2 lg:grid-cols-3 my-4 gap-y-1 gap-x-4'>
+                            <CustomFormField
+                              form={form}
+                              name='drivingLicenseNo'
+                              label='License No'
+                              placeholder='Enter license no'
+                              type='number'
+                            />
+                            <CustomFormField
+                              form={form}
+                              name='licenseExpiryDate'
+                              label='License Expiry Date'
+                              placeholder='Enter license expiry date'
+                              type='date'
+                            />
+                            <CustomFormField
+                              form={form}
+                              name='qualification'
+                              label='Qualification'
+                              placeholder='Enter qualification'
+                              type='text'
+                            />
+                            <CustomFormField
+                              form={form}
+                              name='specialization'
+                              label='Specialization'
+                              placeholder='Enter specialization'
+                              type='text'
+                            />
+                            <CustomFormField
+                              form={form}
+                              name='yearsOfExperience'
+                              label='Year of experience'
+                              placeholder='Enter year of experience'
+                              type='number'
+                            />
+                            <CustomFormField
+                              form={form}
+                              name='vehicleRegistrationNo'
+                              label='Vehicle Registration No'
+                              placeholder='Enter vehicle registration no'
+                              type='number'
+                            />
+                            <CustomFormField
+                              form={form}
+                              name='vehicleModel'
+                              label='Make and Model of Vehicle'
+                              placeholder='Enter vehicle model'
+                              type='text'
+                            />
+                          </div>
+                        </>
+                      )}
 
-              <div className='w-full md:w-[48%] lg:w-[32%]'>
-                <CustomFormField
-                  form={form}
-                  name='bio'
-                  label='Bio'
-                  placeholder='Tell us about yourself'
-                  type='text'
-                  cols={30}
-                  rows={5}
-                />
-              </div>
+                      {step === 3 && (
+                        <>
+                          <CardTitle className='text-lg'>
+                            Upload Documents
+                          </CardTitle>
+                          <div className='grid grid-col-1 md:grid-cols-2 lg:grid-cols-3 my-4 gap-y-3 gap-x-4 text-gray-700'>
+                            <div>
+                              <Upload
+                                label='Driving License'
+                                fileType='image'
+                                form={form}
+                                name='drivingLicenseFile'
+                              />
+                              {form.watch('drivingLicenseFile') && (
+                                <a
+                                  href={form.watch('drivingLicenseFile')?.[0]}
+                                  target='_blank'
+                                  rel='noreferrer'
+                                  className='text-primary text-xs underline pl-3'
+                                >
+                                  View file
+                                </a>
+                              )}
+                            </div>
+                            <div>
+                              <Upload
+                                label='Vehicle Registration'
+                                fileType='image'
+                                form={form}
+                                name='vehicleRegistrationFile'
+                              />
+                              {form.watch('vehicleRegistrationFile') && (
+                                <a
+                                  href={
+                                    form.watch('vehicleRegistrationFile')?.[0]
+                                  }
+                                  target='_blank'
+                                  rel='noreferrer'
+                                  className='text-primary text-xs underline pl-3'
+                                >
+                                  View file
+                                </a>
+                              )}
+                            </div>
+                            <div>
+                              <Upload
+                                label='Proof of Insurance'
+                                fileType='image'
+                                form={form}
+                                name='proofOfInsuranceFile'
+                              />
+                              {form.watch('proofOfInsuranceFile') && (
+                                <a
+                                  href={form.watch('proofOfInsuranceFile')?.[0]}
+                                  target='_blank'
+                                  rel='noreferrer'
+                                  className='text-primary text-xs underline pl-3'
+                                >
+                                  View file
+                                </a>
+                              )}
+                            </div>
+                            <div>
+                              <Upload
+                                label='CRP/DBS Check Certificate'
+                                fileType='image'
+                                form={form}
+                                name='dbsCertificateFile'
+                              />
+                              {form.watch('dbsCertificateFile') && (
+                                <a
+                                  href={form.watch('dbsCertificateFile')?.[0]}
+                                  target='_blank'
+                                  rel='noreferrer'
+                                  className='text-primary text-xs underline pl-3'
+                                >
+                                  View file
+                                </a>
+                              )}
+                            </div>
+                          </div>
+                          <div className='grid grid-cols-1'>
+                            <CustomFormField
+                              form={form}
+                              name='termAndCondition'
+                              label='Terms and Conditions'
+                              type='text'
+                              fieldType='checkbox'
+                            />
+                            <CardDescription className='mb-5'>
+                              By submitting this form, I confirm that all the I
+                              agree to abide by the rules and regulations set
+                              forth by book driving Ltd and understand that any
+                              misrepresentation may lead to the termination of
+                              my registration.
+                            </CardDescription>
+                          </div>
+                        </>
+                      )}
 
-              <div className='w-full md:w-[48%] lg:w-[32%]'>
-                <Upload
-                  label='Image'
-                  setFileLink={setFileLink}
-                  fileLink={fileLink}
-                  fileType='image'
-                />
+                      {step === 4 && (
+                        <>
+                          <CardTitle className='text-lg'>Summary</CardTitle>
+                          <CardDescription>
+                            Summary of your account details
+                          </CardDescription>
 
-                {fileLink.length > 0 && (
-                  <div className='avatar text-center flex justify-center items-end mt-2'>
-                    <div className='w-12 mask mask-squircle'>
-                      <Image
-                        src={fileLink?.[0]}
-                        alt='avatar'
-                        width={50}
-                        height={50}
-                        style={{ objectFit: 'cover' }}
-                        className='rounded-full'
-                      />
+                          <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 my-5'>
+                            <Card>
+                              <CardHeader className='pb-2'>
+                                <CardTitle className='text-md'>
+                                  Personal Information
+                                </CardTitle>
+                              </CardHeader>
+                              <CardContent>
+                                <p className='text-sm'>
+                                  <span className='font-bold pr-2'>
+                                    Full Name:
+                                  </span>
+                                  <span>{form.watch('fullName')}</span>
+                                </p>
+                                <p className='text-sm'>
+                                  <span className='font-bold pr-2'>
+                                    Contact No:
+                                  </span>
+                                  <span>{form.watch('contactNo')}</span>
+                                </p>
+                                <p className='text-sm'>
+                                  <span className='font-bold pr-2'>
+                                    Date of Birth:
+                                  </span>
+                                  <span>{form.watch('dateOfBirth')}</span>
+                                </p>
+                                <p className='text-sm'>
+                                  <span className='font-bold pr-2'>
+                                    Address{' '}
+                                  </span>
+                                  <span>{form.watch('address')}</span>
+                                </p>
+                                <p className='text-sm'>
+                                  <span className='font-bold pr-2'>
+                                    Street:{' '}
+                                  </span>
+                                  <span>{form.watch('street')}</span>
+                                </p>
+                                <p className='text-sm'>
+                                  <span className='font-bold pr-2'>City: </span>
+                                  <span>{form.watch('city')}</span>
+                                </p>
+                                <p className='text-sm'>
+                                  <span className='font-bold pr-2'>
+                                    Postal Code:
+                                  </span>
+                                  <span>{form.watch('postalCode')}</span>
+                                </p>
+                              </CardContent>
+                            </Card>
+                            <Card>
+                              <CardHeader className='pb-2'>
+                                <CardTitle className='text-md'>
+                                  Driving Instructor Details
+                                </CardTitle>
+                              </CardHeader>
+                              <CardContent>
+                                <p className='text-sm'>
+                                  <span className='font-bold pr-2'>
+                                    Driving License No:
+                                  </span>
+                                  <span>{form.watch('drivingLicenseNo')}</span>
+                                </p>
+                                <p className='text-sm'>
+                                  <span className='font-bold pr-2'>
+                                    License Expire Date:
+                                  </span>
+                                  <span>{form.watch('licenseExpiryDate')}</span>
+                                </p>
+                                <p className='text-sm'>
+                                  <span className='font-bold pr-2'>
+                                    Qualifications:
+                                  </span>
+                                  <span>{form.watch('qualification')}</span>
+                                </p>
+                                <p className='text-sm'>
+                                  <span className='font-bold pr-2'>
+                                    Specialization:
+                                  </span>
+                                  <span>{form.watch('specialization')}</span>
+                                </p>
+                                <p className='text-sm'>
+                                  <span className='font-bold pr-2'>
+                                    Vehicle Registration No:
+                                  </span>
+                                  <span>
+                                    {form.watch('vehicleRegistrationFile')}
+                                  </span>
+                                </p>
+                                <p className='text-sm'>
+                                  <span className='font-bold pr-2'>
+                                    Make & Model of Vehicle
+                                  </span>
+                                  <span>{form.watch('vehicleModel')}</span>
+                                </p>
+                              </CardContent>
+                            </Card>
+
+                            <Card>
+                              <CardHeader className='pb-2'>
+                                <CardTitle className='text-md'>
+                                  Uploaded Documents
+                                </CardTitle>
+                              </CardHeader>
+                              <CardContent>
+                                <p className='text-sm'>
+                                  <span className='font-bold pr-2'>
+                                    Driving License File:
+                                  </span>
+                                  <span>
+                                    <a
+                                      href={form.watch('drivingLicenseFile')}
+                                      target='_blank'
+                                      className='underline'
+                                    >
+                                      View
+                                    </a>
+                                  </span>
+                                </p>
+                                <p className='text-sm'>
+                                  <span className='font-bold pr-2'>
+                                    Vehicle Registration File:
+                                  </span>
+                                  <span>
+                                    <a
+                                      href={form.watch(
+                                        'vehicleRegistrationFile'
+                                      )}
+                                      target='_blank'
+                                      className='underline'
+                                    >
+                                      View
+                                    </a>
+                                  </span>
+                                </p>
+                                <p className='text-sm'>
+                                  <span className='font-bold pr-2'>
+                                    Proof of Insurance File:
+                                  </span>
+                                  <span>
+                                    <a
+                                      href={form.watch('proofOfInsuranceFile')}
+                                      target='_blank'
+                                      className='underline'
+                                    >
+                                      View
+                                    </a>
+                                  </span>
+                                </p>
+                                <p className='text-sm'>
+                                  <span className='font-bold pr-2'>
+                                    DBS Certificate File:
+                                  </span>
+                                  <span>
+                                    <a
+                                      href={form.watch('dbsCertificateFile')}
+                                      target='_blank'
+                                      className='underline'
+                                    >
+                                      View
+                                    </a>
+                                  </span>
+                                </p>
+                              </CardContent>
+                            </Card>
+                          </div>
+                        </>
+                      )}
+
+                      <div className='space-x-5 text-center'>
+                        <FormButton
+                          loading={updateApi?.isPending}
+                          label='Back'
+                          type='button'
+                          className='w-28'
+                          variant='destructive'
+                          onClick={() => setStep(step - 1)}
+                          disabled={step === 1}
+                        />
+                        <FormButton
+                          loading={updateApi?.isPending}
+                          label={step === 4 ? 'Submit' : 'Next'}
+                          className='w-28'
+                          type='submit'
+                        />
+                      </div>
                     </div>
-                  </div>
-                )}
-              </div>
-
-              <div className='flex justify-start flex-wrap flex-row w-full gap-2'>
-                <div className='w-full'>
-                  <hr className='my-5' />
-                </div>
-                <div className='w-full md:w-[48%] lg:w-[32%]'>
-                  <CustomFormField
-                    form={form}
-                    name='password'
-                    label='Password'
-                    placeholder="Leave blank if you don't want to change"
-                    type='password'
-                  />
-                </div>
-                <div className='w-full md:w-[48%] lg:w-[32%]'>
-                  <CustomFormField
-                    form={form}
-                    name='confirmPassword'
-                    label='Confirm Password'
-                    placeholder='Confirm Password'
-                    type='password'
-                  />
-                </div>
-              </div>
-            </div>
-
-            <div className='w-full md:w-[48%] lg:w-[32%] pt-3'>
-              <FormButton
-                loading={updateApi?.isPending}
-                label='Update Profile'
-                className='w-full'
-              />
-            </div>
-          </form>
-        </Form>
+                  )}
+              </form>
+            </Form>
+          </CardContent>
+        </Card>
       </div>
     </div>
   )

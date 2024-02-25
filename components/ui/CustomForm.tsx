@@ -61,10 +61,10 @@ type Prop = Record<'value' | 'label', string>
 export interface FormInputProp {
   multiple?: boolean
   label?: string
-  setFileLink: (e: any) => void
-  fileLink: string[]
   fileType: 'image' | 'document'
   showLabel?: boolean
+  form: UseFormReturn<any, any>
+  name: string
 }
 
 interface ListItem {
@@ -326,10 +326,10 @@ export const FormButton = ({
 export const Upload = ({
   multiple = false,
   label,
-  setFileLink,
-  fileLink,
   fileType,
   showLabel = true,
+  form,
+  name,
   ...props
 }: FormInputProp) => {
   const [file, setFile] = React.useState<string[]>([])
@@ -352,11 +352,10 @@ export const Upload = ({
         ?.mutateAsync(formData)
         .then((res) => {
           const urls = res.data?.map((item: any) => item.url)
-
           if (multiple) {
-            setFileLink([...fileLink, ...urls])
+            form?.setValue(name, [...form?.getValues(name), ...urls])
           } else {
-            setFileLink(urls)
+            form?.setValue(name, urls)
           }
         })
         .catch((err) => err)
@@ -390,6 +389,9 @@ export const Upload = ({
           </span>
         </div>
       )}
+      <FormMessage className=' mb-2 text-xs'>
+        {form?.formState.errors?.[name]?.message as string}
+      </FormMessage>
       {uploadApi?.isError && (
         <span className='mt-1 text-xs text-red-500'>
           {`${uploadApi?.error}` || `${fileType} upload failed`}

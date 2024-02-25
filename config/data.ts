@@ -76,7 +76,7 @@ const clientPermissions = [
   },
   {
     id: 't-Snd86AW-TlIlMEDmYst',
-    name: 'Profile',
+    name: 'Complete Account Profile',
     path: '/account/profile/complete',
     menu: 'hidden',
     sort: sort.hidden,
@@ -158,6 +158,13 @@ const permissions = [
     id: 'LMG211l6gxRRkjAHPvhgw',
     description: 'Profile',
     route: '/api/profile/:id',
+    name: 'Profile',
+    method: 'PUT',
+  },
+  {
+    id: 'LMG211l6gxRRkjsHPvhgw',
+    description: 'Profile Complete',
+    route: '/api/profile/complete/:id',
     name: 'Profile',
     method: 'PUT',
   },
@@ -276,9 +283,9 @@ const permissions = [
   },
   {
     id: 'HRu69jNpsj4pJXs_cjCQ5',
-    description: 'Database',
+    description: 'Backup Database',
     route: '/api/databases/backup',
-    name: 'Backup database',
+    name: 'Database',
     method: 'POST',
   },
 ]

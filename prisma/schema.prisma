@@ -128,7 +128,7 @@ model Instructor {
   vehicleModel            String
   drivingLicenseFile      String
   vehicleRegistrationFile String
-  proofOfInsurance        String
+  proofOfInsuranceFile    String
   dbsCertificateFile      String
   termAndCondition        Boolean
   createdAt               DateTime        @default(now())
