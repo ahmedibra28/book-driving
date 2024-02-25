@@ -15,7 +15,7 @@ export async function GET(req: Request) {
     await execAsync(`mkdir -p ${path}`)
     const databases = readdirSync(path)
 
-    return NextResponse.json({ data: databases?.reverse() || [] })
+    return NextResponse.json({ data: databases?.sort().reverse() || [] })
   } catch ({ status = 500, message }: any) {
     return getErrorResponse(message, status)
   }

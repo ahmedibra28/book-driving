@@ -4,6 +4,7 @@ import { exec } from 'child_process'
 import { promisify } from 'util'
 import { zip } from 'zip-a-folder'
 import { isAuth } from '@/lib/auth'
+import { readdirSync } from 'fs'
 
 const execAsync = promisify(exec)
 
@@ -19,6 +20,17 @@ export async function POST(req: Request) {
 
     // Create the backup directory if it does not exist
     await execAsync(`mkdir -p ${backupDir}`)
+
+    const dbDirs = readdirSync(`${process.cwd()}/db/`)
+    const dbZipDirs = dbDirs?.filter((item) => item.includes('.zip')).sort()
+    const keepZippedDbs = dbZipDirs.slice(-2)
+    const deleteZippedDbs = dbZipDirs.filter(
+      (item) => !keepZippedDbs.includes(item)
+    )
+
+    deleteZippedDbs?.forEach(async (db) => {
+      await execAsync(`rm -rf ${process.cwd()}/db/${db}`)
+    })
 
     const DB_USER = getEnvVariable('DB_USER')
     const DB_PASS = getEnvVariable('DB_PASS')
