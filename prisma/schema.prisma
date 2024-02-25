@@ -1,0 +1,196 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                  String   @id @default(dbgenerated("nanoid()")) @db.VarChar(21)
+  email               String   @unique
+  name                String
+  image               String?
+  mobile              Int?
+  address             String?
+  bio                 String?
+  password            String
+  confirmed           Boolean  @default(false)
+  blocked             Boolean  @default(false)
+  resetPasswordToken  String?
+  resetPasswordExpire BigInt?
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  role         Role          @relation(fields: [roleId], references: [id], onDelete: Restrict)
+  roleId       String
+  lessons      Lesson[]
+  transactions Transaction[]
+
+  @@map("users")
+}
+
+model Role {
+  id          String   @id @default(dbgenerated("nanoid()")) @db.VarChar(21)
+  name        String   @unique
+  type        String   @unique
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  users             User[]
+  permissions       Permission[]
+  clientPermissions ClientPermission[]
+
+  @@map("roles")
+}
+
+model Permission {
+  id          String   @id @default(dbgenerated("nanoid()")) @db.VarChar(21)
+  name        String
+  method      Method
+  route       String
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  role Role[]
+
+  @@unique([method, route])
+  @@map("permissions")
+}
+
+model ClientPermission {
+  id          String   @id @default(dbgenerated("nanoid()")) @db.VarChar(21)
+  name        String   @unique
+  sort        Int
+  menu        String
+  path        String   @unique
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  role Role[]
+
+  @@map("client_permissions")
+}
+
+model Lesson {
+  id                        String                    @id @default(dbgenerated("nanoid()")) @db.VarChar(21)
+  lessonType                LessonType
+  transmissionType          TransmissionType
+  ultimateTHeoryPackage     Boolean
+  fastTrackedTheoryTest     Boolean
+  fastTrackedDriveTest      Boolean
+  lessonPreferences         LessonPreferences
+  previousDrivingExperience PreviousDrivingExperience
+  deposit                   Float                     @default(0)
+  instructorPrice           Float                     @default(0)
+  createdAt                 DateTime                  @default(now())
+  updatedAt                 DateTime                  @updatedAt
+
+  description  Description[]
+  createdBy    User          @relation(fields: [createdById], references: [id], onDelete: Restrict)
+  createdById  String
+  transactions Transaction[]
+
+  @@map("lessons")
+}
+
+model Description {
+  id          String   @id @default(dbgenerated("nanoid()")) @db.VarChar(21)
+  description String
+  lessons     Lesson[]
+
+  @@map("descriptions")
+}
+
+model Student {
+  id        String @id @default(dbgenerated("nanoid()")) @db.VarChar(21)
+  fullName  String
+  contactNo String
+  email     String
+  address   String
+  licenseNo String
+
+  transaction Transaction?
+
+  @@map("students")
+}
+
+model Transaction {
+  id                 String            @id @default(dbgenerated("nanoid()")) @db.VarChar(21)
+  isPassedTheoryTest Boolean
+  passedTheoryDate   DateTime
+  discountTest       Float
+  startDate          DateTime
+  practicalTestDate  DateTime
+  drivingExperience  DrivingExperience
+  refferedFrom       RefferedFrom
+  discountCode       String
+  amount             Float
+
+  student      Student @relation(fields: [studentId], references: [id], onDelete: Restrict)
+  studentId    String  @unique
+  lesson       Lesson  @relation(fields: [lessonId], references: [id], onDelete: Restrict)
+  lessonId     String
+  instructor   User?   @relation(fields: [instructorId], references: [id], onDelete: Restrict)
+  instructorId String? @unique
+
+  @@map("transactions")
+}
+
+enum RefferedFrom {
+  GOOGLE
+  FACEBOOK
+  INSTAGRAM
+  RECOMMENDATION
+  OTHER
+}
+
+enum PreviousDrivingExperience {
+  I_HAVE_NO_EXPERIENCE_AT_ALL_AND_I_AM_NOT_CONFIDENT
+  I_HAVE_NO_EXPERIENCE_AT_ALL_AND_I_AM_CONFIDENT
+  I_HAVE_COMPLETED_1_TO_10_HOURS_OF_LESSONS
+  I_HAVE_COMPLETED_11_TO_20_HOURS_OF_LESSONS
+  I_HAVE_COMPLETED_21_TO_30_HOURS_OF_LESSONS
+  I_HAVE_COMPLETED_31_TO_40_HOURS_OF_LESSONS
+  I_HAVE_COMPLETED_41_OR_MORE_HOURS_OF_LESSONS
+}
+
+enum DrivingExperience {
+  I_CAN_DRIVE_OR_I_HAVE_BEEN_IN_FOR_A_DRIVING_TEST
+  I_HAVE_HAD_30_OR_MORE_DRIVING_LESSONS
+  I_HAVE_HAD_20_TO_25_DRIVING_LESSONS
+  I_HAVE_HAD_15_TO_19_DRIVING_LESSONS
+  I_HAVE_HAD_10_TO_14_DRIVING_LESSONS
+  I_HAVE_HAD_1_TO_9_DRIVING_LESSONS
+  I_HAVE_HAD_NO_LESSONS_AND_I_AM_CONFIDENT
+  I_HAVE_HAD_NO_LESSONS_AND_I_AM_NOT_CONFIDENT
+}
+
+enum LessonPreferences {
+  FLEXIBLE
+  WEEKDAY_MORNINGS
+  WEEKDAY_AFTERNOONS
+  WEEKDAY_EVENINGS
+  WEEKENDS
+}
+
+enum LessonType {
+  WEEKLY
+  INTENSIVELY
+}
+
+enum TransmissionType {
+  MANUAL
+  AUTOMATIC
+}
+
+enum Method {
+  GET
+  POST
+  PUT
+  DELETE
+}
