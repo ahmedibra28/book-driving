@@ -17,6 +17,7 @@ export async function GET(req: NextApiRequestExtended) {
         image: true,
         bio: true,
         address: true,
+        instructor: true,
       },
     })
 

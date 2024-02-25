@@ -8,9 +8,9 @@ const roles = [
   },
   {
     id: 'a75POUlJzMDmaJtz0JCxp',
-    name: 'Authenticated',
-    description: 'Default role given to authenticated user.',
-    type: 'AUTHENTICATED',
+    name: 'Instructor',
+    description: 'Default role given to instructor user.',
+    type: 'INSTRUCTOR',
   },
 ]
 
@@ -73,6 +73,14 @@ const clientPermissions = [
     menu: 'profile',
     sort: sort.profile,
     description: 'Profile page',
+  },
+  {
+    id: 't-Snd86AW-TlIlMEDmYst',
+    name: 'Profile',
+    path: '/account/profile/complete',
+    menu: 'hidden',
+    sort: sort.hidden,
+    description: 'Complete profile page',
   },
   {
     id: 'eWpbNJ9LkTVO4BYyaO1mJ',

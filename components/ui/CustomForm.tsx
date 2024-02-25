@@ -94,6 +94,7 @@ export interface FormProps {
   key?: string
   url?: string
   items?: ListItem[]
+  disabled?: boolean
 }
 export interface FormButtonProp {
   label: string
