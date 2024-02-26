@@ -3,11 +3,11 @@ import Meta from '@/components/Meta'
 
 export const metadata = {
   ...Meta({
-    title: 'Notifications',
+    title: 'Instructors',
   }),
 }
 
-export default function NotificationsLayout({
+export default function InstructorsLayout({
   children,
 }: {
   children: React.ReactNode

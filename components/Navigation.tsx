@@ -53,7 +53,7 @@ const Navigation = () => {
     <>
       <div className='hidden lg:block flex-row'>
         <ul className='px-1 flex space-x-4 items-center'>
-          <Link href='/notifications'>
+          <Link href='/instructors'>
             <FaBell />
           </Link>
           {menu.map((item: any, i: number) => (
@@ -148,7 +148,7 @@ const Navigation = () => {
                 </MenubarItem>
                 <MenubarItem>
                   <Link
-                    href='/notifications'
+                    href='/instructors'
                     className='flex flex-row items-center justify-between'
                   >
                     <FaBell /> Notifications

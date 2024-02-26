@@ -108,11 +108,19 @@ const clientPermissions = [
   },
   {
     id: 'HnCMgsT54kcTRYlJGsOC4',
-    name: 'Notification',
-    path: '/notifications',
+    name: 'Instructor',
+    path: '/instructors',
     menu: 'hidden',
     sort: sort.hidden,
-    description: 'Notification page',
+    description: 'Instructor page',
+  },
+  {
+    id: 'HnCMgsl54kcTRYlJGsOC4',
+    name: 'Instructor Details',
+    path: '/instructors/[id]',
+    menu: 'hidden',
+    sort: sort.hidden,
+    description: 'Instructor details page',
   },
 ]
 
@@ -295,6 +303,29 @@ const permissions = [
     route: '/api/databases/backup',
     name: 'Database',
     method: 'POST',
+  },
+
+  // instructor
+  {
+    id: 'X26iEN1J-sBaC4HlPsRgh',
+    description: 'Instructors',
+    route: '/api/instructors',
+    name: 'Instructor',
+    method: 'GET',
+  },
+  {
+    id: 'HRu69jNp0m4pJXs_cjCQ5',
+    description: 'Instructor details',
+    route: '/api/instructors/:id',
+    name: 'Instructor',
+    method: 'GET',
+  },
+  {
+    id: 'X9ACZfrFXoCAl-2uPXyw9',
+    description: 'Instructor',
+    route: '/api/instructors/:id',
+    name: 'Instructor',
+    method: 'PUT',
   },
 ]
 
