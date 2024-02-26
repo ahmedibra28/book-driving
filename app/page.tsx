@@ -17,8 +17,9 @@ export default function Home() {
 
   useEffect(() => {
     if (getApi?.isSuccess && userInfo?.id) {
+      const status = getApi?.data?.instructor?.status
       if (
-        getApi?.data?.instructor?.status !== 'APPROVED' &&
+        !['APPROVED', 'PENDING'].includes(status) &&
         userInfo.role === 'INSTRUCTOR'
       ) {
         router.push('/account/profile/complete')

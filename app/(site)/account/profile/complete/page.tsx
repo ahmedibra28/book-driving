@@ -21,6 +21,8 @@ import {
   Card,
 } from '@/components/ui/card'
 import { FaAnglesRight } from 'react-icons/fa6'
+import type { User as IUser, Instructor as IInstructor } from '@prisma/client'
+import DateTime from '@/lib/dateTime'
 
 const Profile = () => {
   const [step, setStep] = React.useState(1)
@@ -101,7 +103,6 @@ const Profile = () => {
   })
 
   function onSubmit(values: z.infer<typeof FormSchema>) {
-    console.log(values)
     if (step < 4) return setStep(step + 1)
     updateApi?.mutateAsync({
       ...values,
@@ -120,11 +121,60 @@ const Profile = () => {
         image,
       })
       form.reset()
+
+      router.push('/')
     }
     // eslint-disable-next-line
   }, [updateApi?.isSuccess])
 
-  const profile = getApi?.data
+  const profile = getApi?.data as IUser & { instructor: IInstructor }
+  const status = profile?.instructor?.status
+
+  useEffect(() => {
+    if (getApi?.isSuccess && userInfo.role === 'INSTRUCTOR') {
+      if (['APPROVED', 'PENDING'].includes(status)) router.push('/')
+    }
+
+    // eslint-disable-next-line
+  }, [getApi?.isSuccess])
+
+  useEffect(() => {
+    if (profile?.instructor?.status === 'REJECTED' && getApi?.isSuccess) {
+      const { instructor } = profile
+      Object.keys(instructor).forEach((key) => {
+        // @ts-ignore
+        form.setValue(key, instructor?.[key])
+        // @ts-ignore
+        form.setValue(
+          'dateOfBirth',
+          // @ts-ignore
+          DateTime(instructor?.dateOfBirth).format('YYYY-MM-DD')
+        )
+        // @ts-ignore
+        form.setValue(
+          'licenseExpiryDate',
+          // @ts-ignore
+          DateTime(instructor?.licenseExpiryDate).format('YYYY-MM-DD')
+        )
+
+        // @ts-ignore
+        form.setValue('yearsOfExperience', `${instructor?.yearsOfExperience}`)
+        // @ts-ignore
+        form.setValue('drivingLicenseFile', [instructor?.drivingLicenseFile])
+        // @ts-ignore
+        form.setValue('vehicleRegistrationFile', [
+          instructor?.vehicleRegistrationFile,
+        ])
+        // @ts-ignore
+        form.setValue('proofOfInsuranceFile', [
+          instructor?.proofOfInsuranceFile,
+        ])
+        // @ts-ignore
+        form.setValue('dbsCertificateFile', [instructor?.dbsCertificateFile])
+      })
+    }
+    // eslint-disable-next-line
+  }, [getApi?.isSuccess])
 
   const stepper = ({
     num,
@@ -164,9 +214,12 @@ const Profile = () => {
       {getApi?.isPending && <Spinner />}
 
       <div className='bg-opacity-60 max-w-4xl mx-auto'>
+        {profile?.instructor?.note && (
+          <div className='text-red-500 mb-2'>{profile?.instructor?.note}</div>
+        )}
         <Card className='w-full mx-w-3xl lg:max-w-5xl mx-auto'>
           {userInfo.role === 'INSTRUCTOR' &&
-            profile?.instructor?.status !== 'PENDING' && (
+            !['APPROVED', 'PENDING'].includes(status) && (
               <CardHeader>
                 <CardTitle>Complete your account</CardTitle>
                 <CardDescription>
@@ -201,7 +254,7 @@ const Profile = () => {
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)}>
                 {userInfo.role === 'INSTRUCTOR' &&
-                  profile?.instructor?.status !== 'PENDING' && (
+                  !['APPROVED', 'PENDING'].includes(status) && (
                     <div>
                       {step === 1 && (
                         <>
@@ -514,7 +567,7 @@ const Profile = () => {
                                     Vehicle Registration No:
                                   </span>
                                   <span>
-                                    {form.watch('vehicleRegistrationFile')}
+                                    {form.watch('vehicleRegistrationNo')}
                                   </span>
                                 </p>
                                 <p className='text-sm'>

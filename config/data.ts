@@ -106,6 +106,14 @@ const clientPermissions = [
     sort: sort.admin,
     description: 'Database page',
   },
+  {
+    id: 'HnCMgsT54kcTRYlJGsOC4',
+    name: 'Notification',
+    path: '/notifications',
+    menu: 'hidden',
+    sort: sort.hidden,
+    description: 'Notification page',
+  },
 ]
 
 const permissions = [

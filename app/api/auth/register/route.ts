@@ -25,7 +25,8 @@ export async function POST(req: Request) {
 
     const reset = await getResetPasswordToken(4320)
 
-    const roleId = roles.find((item) => item.type === 'AUTHENTICATED')?.id
+    const roleId = roles.find((item) => item.type === 'INSTRUCTOR')?.id
+    if (!roleId) return getErrorResponse('Role not found', 404)
 
     await prisma.user.create({
       data: {
