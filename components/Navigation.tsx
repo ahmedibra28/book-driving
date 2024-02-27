@@ -149,7 +149,7 @@ const Navigation = () => {
                 <MenubarItem>
                   <Link
                     href='/instructors'
-                    className='flex flex-row items-center justify-between'
+                    className='flex flex-row items-center justify-between gap-x-1'
                   >
                     <FaBell /> Notifications
                   </Link>

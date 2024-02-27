@@ -26,6 +26,7 @@ import CustomFormField from '@/components/ui/CustomForm'
 import useDataStore from '@/zustand/dataStore'
 import { useForm } from 'react-hook-form'
 import FormView from '@/components/FormView'
+import { FileIcon } from 'lucide-react'
 
 const FormSchema = z.object({
   note: z.string().refine((value) => value !== '', {
@@ -132,176 +133,177 @@ const Page = ({ params }: { params: { id: string } }) => {
       ) : getApi?.isError ? (
         <Message value={getApi?.error} />
       ) : (
-        <Card className='mt-2'>
-          <CardHeader>
-            <CardTitle>{data?.fullName}</CardTitle>
-            <CardDescription>
-              This instructor is {data?.status?.toLowerCase()}
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 my-5'>
-              <Card>
-                <CardHeader className='pb-2'>
-                  <CardTitle className='text-md'>
-                    Personal Information
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className='text-sm'>
-                    <span className='font-bold pr-2'>Full Name:</span>
-                    <span>{data?.fullName}</span>
-                  </p>
-                  <p className='text-sm'>
-                    <span className='font-bold pr-2'>Contact No:</span>
-                    <span>{data?.contactNo}</span>
-                  </p>
-                  <p className='text-sm'>
-                    <span className='font-bold pr-2'>Date of Birth:</span>
-                    <span>
-                      {DateTime(data?.dateOfBirth).format('YYYY-MM-DD')}
-                    </span>
-                  </p>
-                  <p className='text-sm'>
-                    <span className='font-bold pr-2'>Address </span>
-                    <span>{data?.address}</span>
-                  </p>
-                  <p className='text-sm'>
-                    <span className='font-bold pr-2'>Street: </span>
-                    <span>{data?.street}</span>
-                  </p>
-                  <p className='text-sm'>
-                    <span className='font-bold pr-2'>City: </span>
-                    <span>{data?.city}</span>
-                  </p>
-                  <p className='text-sm'>
-                    <span className='font-bold pr-2'>Postal Code:</span>
-                    <span>{data?.postalCode}</span>
-                  </p>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardHeader className='pb-2'>
-                  <CardTitle className='text-md'>
-                    Driving Instructor Details
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className='text-sm'>
-                    <span className='font-bold pr-2'>Driving License No:</span>
-                    <span>{data?.drivingLicenseNo}</span>
-                  </p>
-                  <p className='text-sm'>
-                    <span className='font-bold pr-2'>License Expire Date:</span>
-                    <span>
-                      {DateTime(data?.licenseExpiryDate).format('YYYY-MM-DD')}
-                    </span>
-                  </p>
-                  <p className='text-sm'>
-                    <span className='font-bold pr-2'>Qualifications:</span>
-                    <span>{data?.qualification}</span>
-                  </p>
-                  <p className='text-sm'>
-                    <span className='font-bold pr-2'>Specialization:</span>
-                    <span>{data?.specialization}</span>
-                  </p>
-                  <p className='text-sm'>
-                    <span className='font-bold pr-2'>
-                      Vehicle Registration No:
-                    </span>
-                    <span>{data?.vehicleRegistrationNo}</span>
-                  </p>
-                  <p className='text-sm'>
-                    <span className='font-bold pr-2'>
-                      Make & Model of Vehicle
-                    </span>
-                    <span>{data?.vehicleModel}</span>
-                  </p>
-                </CardContent>
-              </Card>
+        <div className='space-y-4 py-4'>
+          <Card className='w-full max-w-3xl mx-auto'>
+            <CardHeader>
+              <CardTitle>Personal Information</CardTitle>
+              <CardDescription>
+                Your personal information as provided during registration.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className='border-t pt-4'>
+              <dl className='grid grid-cols-1 gap-6 sm:grid-cols-2'>
+                <div className='space-y-1'>
+                  <dt className='text-sm font-medium text-gray-500 dark:text-gray-400'>
+                    Full Name
+                  </dt>
+                  <dd className='font-medium'>{data?.fullName}</dd>
+                </div>
+                <div className='space-y-1'>
+                  <dt className='text-sm font-medium text-gray-500 dark:text-gray-400'>
+                    Contact No
+                  </dt>
+                  <dd className='font-medium'>{data?.contactNo}</dd>
+                </div>
+                <div className='space-y-1'>
+                  <dt className='text-sm font-medium text-gray-500 dark:text-gray-400'>
+                    Date of Birth
+                  </dt>
+                  <dd className='font-medium'>
+                    {' '}
+                    {DateTime(data?.dateOfBirth).format('YYYY-MM-DD')}
+                  </dd>
+                </div>
+                <div className='space-y-1'>
+                  <dt className='text-sm font-medium text-gray-500 dark:text-gray-400'>
+                    Address
+                  </dt>
+                  <dd className='font-medium'>
+                    {data?.address}, {data?.street}, {data?.city},{' '}
+                    {data?.postalCode}
+                  </dd>
+                </div>
+              </dl>
+            </CardContent>
+          </Card>
 
-              <Card>
-                <CardHeader className='pb-2'>
-                  <CardTitle className='text-md'>Uploaded Documents</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className='text-sm'>
-                    <span className='font-bold pr-2'>
-                      Driving License File:
-                    </span>
-                    <span>
-                      <a
-                        href={data?.drivingLicenseFile}
-                        target='_blank'
-                        className='underline'
-                      >
-                        View
-                      </a>
-                    </span>
-                  </p>
-                  <p className='text-sm'>
-                    <span className='font-bold pr-2'>
-                      Vehicle Registration File:
-                    </span>
-                    <span>
-                      <a
-                        href={data?.vehicleRegistrationFile}
-                        target='_blank'
-                        className='underline'
-                      >
-                        View
-                      </a>
-                    </span>
-                  </p>
-                  <p className='text-sm'>
-                    <span className='font-bold pr-2'>
-                      Proof of Insurance File:
-                    </span>
-                    <span>
-                      <a
-                        href={data?.proofOfInsuranceFile}
-                        target='_blank'
-                        className='underline'
-                      >
-                        View
-                      </a>
-                    </span>
-                  </p>
-                  <p className='text-sm'>
-                    <span className='font-bold pr-2'>
-                      DBS Certificate File:
-                    </span>
-                    <span>
-                      <a
-                        href={data?.dbsCertificateFile}
-                        target='_blank'
-                        className='underline'
-                      >
-                        View
-                      </a>
-                    </span>
-                  </p>
-                </CardContent>
-              </Card>
-            </div>
-          </CardContent>
-          <CardFooter className='flex justify-between'>
-            {data?.status !== 'REJECTED' && (
-              <Button
-                onClick={() => setDialogOpen(true)}
-                variant='destructive'
-                className='w-full md:w-1/3'
-              >
-                Reject
-              </Button>
-            )}
-            {data?.status !== 'APPROVED' && (
-              <Button onClick={() => onApprove()} className='w-full md:w-1/3'>
-                Approve
-              </Button>
-            )}
-          </CardFooter>
-        </Card>
+          <Card className='w-full max-w-3xl mx-auto'>
+            <CardHeader>
+              <CardTitle>Driving Instructor Details</CardTitle>
+              <CardDescription>
+                Your driving instructor details as provided during registration.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className='border-t pt-4'>
+              <dl className='grid grid-cols-1 gap-6 sm:grid-cols-2'>
+                <div className='space-y-1'>
+                  <dt className='text-sm font-medium text-gray-500 dark:text-gray-400'>
+                    Driving License No
+                  </dt>
+                  <dd className='font-medium'>{data?.drivingLicenseNo}</dd>
+                </div>
+                <div className='space-y-1'>
+                  <dt className='text-sm font-medium text-gray-500 dark:text-gray-400'>
+                    License Expire Date
+                  </dt>
+                  <dd className='font-medium'>
+                    {DateTime(data?.licenseExpiryDate).format('YYYY-MM-DD')}
+                  </dd>
+                </div>
+                <div className='space-y-1'>
+                  <dt className='text-sm font-medium text-gray-500 dark:text-gray-400'>
+                    Qualifications
+                  </dt>
+                  <dd className='font-medium'>{data?.qualification}</dd>
+                </div>
+                <div className='space-y-1'>
+                  <dt className='text-sm font-medium text-gray-500 dark:text-gray-400'>
+                    Specialization
+                  </dt>
+                  <dd className='font-medium'>{data?.specialization}</dd>
+                </div>
+                <div className='space-y-1'>
+                  <dt className='text-sm font-medium text-gray-500 dark:text-gray-400'>
+                    Vehicle Registration No
+                  </dt>
+                  <dd className='font-medium'>{data?.vehicleRegistrationNo}</dd>
+                </div>
+                <div className='space-y-1'>
+                  <dt className='text-sm font-medium text-gray-500 dark:text-gray-400'>
+                    Make & Model of Vehicle
+                  </dt>
+                  <dd className='font-medium'>{data?.vehicleModel}</dd>
+                </div>
+              </dl>
+            </CardContent>
+          </Card>
+
+          <Card className='w-full max-w-3xl mx-auto'>
+            <CardHeader>
+              <CardTitle>Uploaded Documents</CardTitle>
+              <CardDescription>
+                Your uploaded documents as provided during registration.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className='border-t pt-4'>
+              <ul className='grid grid-cols-1 gap-2 text-sm sm:grid-cols-2'>
+                <li className='flex items-center space-x-2'>
+                  <FileIcon className='w-4 h-4 flex-shrink-0' />
+                  <span>Driving License File:</span>
+                  <a
+                    className='ml-auto underline'
+                    href={data?.drivingLicenseFile}
+                    target='_blank'
+                  >
+                    View
+                  </a>
+                </li>
+                <li className='flex items-center space-x-2'>
+                  <FileIcon className='w-4 h-4 flex-shrink-0' />
+                  <span>Vehicle Registration File:</span>
+                  <a
+                    className='ml-auto underline'
+                    href={data?.vehicleRegistrationFile}
+                    target='_blank'
+                  >
+                    View
+                  </a>
+                </li>
+                <li className='flex items-center space-x-2'>
+                  <FileIcon className='w-4 h-4 flex-shrink-0' />
+                  <span>Proof of Insurance File:</span>
+                  <a
+                    className='ml-auto underline'
+                    href={data?.proofOfInsuranceFile}
+                    target='_blank'
+                  >
+                    View
+                  </a>
+                </li>
+                <li className='flex items-center space-x-2'>
+                  <FileIcon className='w-4 h-4 flex-shrink-0' />
+                  <span>DBS Certificate File:</span>
+                  <a
+                    className='ml-auto underline'
+                    href={data?.dbsCertificateFile}
+                    target='_blank'
+                  >
+                    View
+                  </a>
+                </li>
+              </ul>
+            </CardContent>
+          </Card>
+
+          <Card className='w-full max-w-3xl mx-auto'>
+            <CardFooter className='grid grid-cols-1 sm:grid-cols-2 gap-6 mt-5'>
+              {data?.status !== 'REJECTED' && (
+                <Button
+                  onClick={() => setDialogOpen(true)}
+                  variant='destructive'
+                  className='w-full md:w-1/3'
+                >
+                  Reject
+                </Button>
+              )}
+              {data?.status !== 'APPROVED' && (
+                <Button onClick={() => onApprove()} className='w-full md:w-1/3'>
+                  Approve
+                </Button>
+              )}
+            </CardFooter>
+          </Card>
+        </div>
       )}
     </>
   )

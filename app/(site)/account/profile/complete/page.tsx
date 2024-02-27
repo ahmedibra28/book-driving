@@ -23,6 +23,8 @@ import {
 import { FaAnglesRight } from 'react-icons/fa6'
 import type { User as IUser, Instructor as IInstructor } from '@prisma/client'
 import DateTime from '@/lib/dateTime'
+import ReactMarkdown from 'react-markdown'
+import { FileIcon } from 'lucide-react'
 
 const Profile = () => {
   const [step, setStep] = React.useState(1)
@@ -215,7 +217,9 @@ const Profile = () => {
 
       <div className='bg-opacity-60 max-w-4xl mx-auto'>
         {profile?.instructor?.note && (
-          <div className='text-red-500 mb-2'>{profile?.instructor?.note}</div>
+          <ReactMarkdown className='text-red-400 text-sm'>
+            {profile?.instructor?.note}
+          </ReactMarkdown>
         )}
         <Card className='w-full mx-w-3xl lg:max-w-5xl mx-auto'>
           {userInfo.role === 'INSTRUCTOR' &&
@@ -481,169 +485,181 @@ const Profile = () => {
                             Summary of your account details
                           </CardDescription>
 
-                          <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 my-5'>
-                            <Card>
-                              <CardHeader className='pb-2'>
-                                <CardTitle className='text-md'>
-                                  Personal Information
-                                </CardTitle>
+                          <div className='space-y-4 py-4'>
+                            <Card className='w-full max-w-3xl mx-auto'>
+                              <CardHeader>
+                                <CardTitle>Personal Information</CardTitle>
+                                <CardDescription>
+                                  Your personal information as provided during
+                                  registration.
+                                </CardDescription>
                               </CardHeader>
-                              <CardContent>
-                                <p className='text-sm'>
-                                  <span className='font-bold pr-2'>
-                                    Full Name:
-                                  </span>
-                                  <span>{form.watch('fullName')}</span>
-                                </p>
-                                <p className='text-sm'>
-                                  <span className='font-bold pr-2'>
-                                    Contact No:
-                                  </span>
-                                  <span>{form.watch('contactNo')}</span>
-                                </p>
-                                <p className='text-sm'>
-                                  <span className='font-bold pr-2'>
-                                    Date of Birth:
-                                  </span>
-                                  <span>{form.watch('dateOfBirth')}</span>
-                                </p>
-                                <p className='text-sm'>
-                                  <span className='font-bold pr-2'>
-                                    Address{' '}
-                                  </span>
-                                  <span>{form.watch('address')}</span>
-                                </p>
-                                <p className='text-sm'>
-                                  <span className='font-bold pr-2'>
-                                    Street:{' '}
-                                  </span>
-                                  <span>{form.watch('street')}</span>
-                                </p>
-                                <p className='text-sm'>
-                                  <span className='font-bold pr-2'>City: </span>
-                                  <span>{form.watch('city')}</span>
-                                </p>
-                                <p className='text-sm'>
-                                  <span className='font-bold pr-2'>
-                                    Postal Code:
-                                  </span>
-                                  <span>{form.watch('postalCode')}</span>
-                                </p>
-                              </CardContent>
-                            </Card>
-                            <Card>
-                              <CardHeader className='pb-2'>
-                                <CardTitle className='text-md'>
-                                  Driving Instructor Details
-                                </CardTitle>
-                              </CardHeader>
-                              <CardContent>
-                                <p className='text-sm'>
-                                  <span className='font-bold pr-2'>
-                                    Driving License No:
-                                  </span>
-                                  <span>{form.watch('drivingLicenseNo')}</span>
-                                </p>
-                                <p className='text-sm'>
-                                  <span className='font-bold pr-2'>
-                                    License Expire Date:
-                                  </span>
-                                  <span>{form.watch('licenseExpiryDate')}</span>
-                                </p>
-                                <p className='text-sm'>
-                                  <span className='font-bold pr-2'>
-                                    Qualifications:
-                                  </span>
-                                  <span>{form.watch('qualification')}</span>
-                                </p>
-                                <p className='text-sm'>
-                                  <span className='font-bold pr-2'>
-                                    Specialization:
-                                  </span>
-                                  <span>{form.watch('specialization')}</span>
-                                </p>
-                                <p className='text-sm'>
-                                  <span className='font-bold pr-2'>
-                                    Vehicle Registration No:
-                                  </span>
-                                  <span>
-                                    {form.watch('vehicleRegistrationNo')}
-                                  </span>
-                                </p>
-                                <p className='text-sm'>
-                                  <span className='font-bold pr-2'>
-                                    Make & Model of Vehicle
-                                  </span>
-                                  <span>{form.watch('vehicleModel')}</span>
-                                </p>
+                              <CardContent className='border-t pt-4'>
+                                <dl className='grid grid-cols-1 gap-6 sm:grid-cols-2'>
+                                  <div className='space-y-1'>
+                                    <dt className='text-sm font-medium text-gray-500 dark:text-gray-400'>
+                                      Full Name
+                                    </dt>
+                                    <dd className='font-medium'>
+                                      {form.watch('fullName')}
+                                    </dd>
+                                  </div>
+                                  <div className='space-y-1'>
+                                    <dt className='text-sm font-medium text-gray-500 dark:text-gray-400'>
+                                      Contact No
+                                    </dt>
+                                    <dd className='font-medium'>
+                                      {form.watch('contactNo')}
+                                    </dd>
+                                  </div>
+                                  <div className='space-y-1'>
+                                    <dt className='text-sm font-medium text-gray-500 dark:text-gray-400'>
+                                      Date of Birth
+                                    </dt>
+                                    <dd className='font-medium'>
+                                      {DateTime(
+                                        form.watch('dateOfBirth')
+                                      ).format('YYYY-MM-DD')}
+                                    </dd>
+                                  </div>
+                                  <div className='space-y-1'>
+                                    <dt className='text-sm font-medium text-gray-500 dark:text-gray-400'>
+                                      Address
+                                    </dt>
+                                    <dd className='font-medium'>
+                                      {form.watch('address')},{' '}
+                                      {form.watch('street')},{' '}
+                                      {form.watch('city')},{' '}
+                                      {form.watch('postalCode')}
+                                    </dd>
+                                  </div>
+                                </dl>
                               </CardContent>
                             </Card>
 
-                            <Card>
-                              <CardHeader className='pb-2'>
-                                <CardTitle className='text-md'>
-                                  Uploaded Documents
+                            <Card className='w-full max-w-3xl mx-auto'>
+                              <CardHeader>
+                                <CardTitle>
+                                  Driving Instructor Details
                                 </CardTitle>
+                                <CardDescription>
+                                  Your driving instructor details as provided
+                                  during registration.
+                                </CardDescription>
                               </CardHeader>
-                              <CardContent>
-                                <p className='text-sm'>
-                                  <span className='font-bold pr-2'>
-                                    Driving License File:
-                                  </span>
-                                  <span>
+                              <CardContent className='border-t pt-4'>
+                                <dl className='grid grid-cols-1 gap-6 sm:grid-cols-2'>
+                                  <div className='space-y-1'>
+                                    <dt className='text-sm font-medium text-gray-500 dark:text-gray-400'>
+                                      Driving License No
+                                    </dt>
+                                    <dd className='font-medium'>
+                                      {form.watch('drivingLicenseNo')}
+                                    </dd>
+                                  </div>
+                                  <div className='space-y-1'>
+                                    <dt className='text-sm font-medium text-gray-500 dark:text-gray-400'>
+                                      License Expire Date
+                                    </dt>
+                                    <dd className='font-medium'>
+                                      {DateTime(
+                                        form.watch('licenseExpiryDate')
+                                      ).format('YYYY-MM-DD')}
+                                    </dd>
+                                  </div>
+                                  <div className='space-y-1'>
+                                    <dt className='text-sm font-medium text-gray-500 dark:text-gray-400'>
+                                      Qualifications
+                                    </dt>
+                                    <dd className='font-medium'>
+                                      {form.watch('qualification')}
+                                    </dd>
+                                  </div>
+                                  <div className='space-y-1'>
+                                    <dt className='text-sm font-medium text-gray-500 dark:text-gray-400'>
+                                      Specialization
+                                    </dt>
+                                    <dd className='font-medium'>
+                                      {form.watch('specialization')}
+                                    </dd>
+                                  </div>
+                                  <div className='space-y-1'>
+                                    <dt className='text-sm font-medium text-gray-500 dark:text-gray-400'>
+                                      Vehicle Registration No
+                                    </dt>
+                                    <dd className='font-medium'>
+                                      {form.watch('vehicleRegistrationNo')}
+                                    </dd>
+                                  </div>
+                                  <div className='space-y-1'>
+                                    <dt className='text-sm font-medium text-gray-500 dark:text-gray-400'>
+                                      Make & Model of Vehicle
+                                    </dt>
+                                    <dd className='font-medium'>
+                                      {form.watch('vehicleModel')}
+                                    </dd>
+                                  </div>
+                                </dl>
+                              </CardContent>
+                            </Card>
+
+                            <Card className='w-full max-w-3xl mx-auto'>
+                              <CardHeader>
+                                <CardTitle>Uploaded Documents</CardTitle>
+                                <CardDescription>
+                                  Your uploaded documents as provided during
+                                  registration.
+                                </CardDescription>
+                              </CardHeader>
+                              <CardContent className='border-t pt-4'>
+                                <ul className='grid grid-cols-1 gap-2 text-sm sm:grid-cols-2'>
+                                  <li className='flex items-center space-x-2'>
+                                    <FileIcon className='w-4 h-4 flex-shrink-0' />
+                                    <span>Driving License File:</span>
                                     <a
+                                      className='ml-auto underline'
                                       href={form.watch('drivingLicenseFile')}
                                       target='_blank'
-                                      className='underline'
                                     >
                                       View
                                     </a>
-                                  </span>
-                                </p>
-                                <p className='text-sm'>
-                                  <span className='font-bold pr-2'>
-                                    Vehicle Registration File:
-                                  </span>
-                                  <span>
+                                  </li>
+                                  <li className='flex items-center space-x-2'>
+                                    <FileIcon className='w-4 h-4 flex-shrink-0' />
+                                    <span>Vehicle Registration File:</span>
                                     <a
+                                      className='ml-auto underline'
                                       href={form.watch(
                                         'vehicleRegistrationFile'
                                       )}
                                       target='_blank'
-                                      className='underline'
                                     >
                                       View
                                     </a>
-                                  </span>
-                                </p>
-                                <p className='text-sm'>
-                                  <span className='font-bold pr-2'>
-                                    Proof of Insurance File:
-                                  </span>
-                                  <span>
+                                  </li>
+                                  <li className='flex items-center space-x-2'>
+                                    <FileIcon className='w-4 h-4 flex-shrink-0' />
+                                    <span>Proof of Insurance File:</span>
                                     <a
+                                      className='ml-auto underline'
                                       href={form.watch('proofOfInsuranceFile')}
                                       target='_blank'
-                                      className='underline'
                                     >
                                       View
                                     </a>
-                                  </span>
-                                </p>
-                                <p className='text-sm'>
-                                  <span className='font-bold pr-2'>
-                                    DBS Certificate File:
-                                  </span>
-                                  <span>
+                                  </li>
+                                  <li className='flex items-center space-x-2'>
+                                    <FileIcon className='w-4 h-4 flex-shrink-0' />
+                                    <span>DBS Certificate File:</span>
                                     <a
+                                      className='ml-auto underline'
                                       href={form.watch('dbsCertificateFile')}
                                       target='_blank'
-                                      className='underline'
                                     >
                                       View
                                     </a>
-                                  </span>
-                                </p>
+                                  </li>
+                                </ul>
                               </CardContent>
                             </Card>
                           </div>
