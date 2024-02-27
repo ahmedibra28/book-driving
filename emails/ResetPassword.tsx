@@ -17,12 +17,8 @@ interface ResetPasswordProps {
   clientName: string
   osName: string
   ip: string
+  baseUrl: string
 }
-
-const baseUrl =
-  process.env.env === 'production'
-    ? `https://ahmedibra.com`
-    : 'http://localhost:3000'
 
 export const ResetPassword = ({
   company,
@@ -30,6 +26,7 @@ export const ResetPassword = ({
   clientName,
   osName,
   ip,
+  baseUrl,
 }: ResetPasswordProps) => (
   <Tailwind
     config={{
@@ -47,7 +44,7 @@ export const ResetPassword = ({
       <Preview>Password Reset Request</Preview>
       <Body className='bg-white'>
         <Container className='px-3 mx-auto font-sans'>
-          <Heading className='text-2xl font-bold text-black my-10'>
+          <Heading className='text-2xl font-bold text-black my-7'>
             Password Reset Request
           </Heading>
 
