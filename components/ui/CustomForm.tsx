@@ -80,7 +80,7 @@ interface ListItem {
 export interface FormProps {
   form: UseFormReturn<any, any>
   name: any
-  label: string
+  label?: string
   placeholder?: string
   type?: React.HTMLInputTypeAttribute
   cols?: number

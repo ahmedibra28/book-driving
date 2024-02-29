@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, FormEvent } from 'react'
 import dynamic from 'next/dynamic'
-import { useForm } from 'react-hook-form'
+import { useFieldArray, useForm } from 'react-hook-form'
 import useAuthorization from '@/hooks/useAuthorization'
 import useApi from '@/hooks/useApi'
 import { useRouter } from 'next/navigation'
@@ -20,19 +20,28 @@ import { TopLoadingBar } from '@/components/TopLoadingBar'
 import { columns } from './columns'
 import useDataStore from '@/zustand/dataStore'
 import { LessonPreferences, PreviousDrivingExperience } from '@/lib/enums'
+import { Button } from '@/components/ui/button'
+import { FaPlus, FaX } from 'react-icons/fa6'
 
 const FormSchema = z.object({
   lessonType: z.string(),
   transmissionType: z.string(),
-  ultimateTheoryPackage: z.string(),
-  fastTrackedTheoryTest: z.string(),
-  fastTrackedDriveTest: z.string(),
+  ultimateTheoryPackage: z.boolean().optional(),
+  fastTrackedTheoryTest: z.boolean().optional(),
+  fastTrackedDriveTest: z.boolean().optional(),
   lessonPreferences: z.string(),
   previousDrivingExperience: z.string(),
   status: z.string(),
   deposit: z.string(),
   instructorPrice: z.string(),
-  description: z.string().optional(),
+  descriptions: z
+    .array(
+      z.object({
+        file: z.any(),
+        description: z.string().min(1, { message: 'Description is required' }),
+      })
+    )
+    .nonempty({ message: 'Description is required' }),
 })
 
 const Page = () => {
@@ -79,6 +88,15 @@ const Page = () => {
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
+    defaultValues: {
+      descriptions: [{ description: '' }],
+    },
+  })
+
+  // { fields, append, prepend, remove, swap, move, insert }
+  const formArray = useFieldArray({
+    name: 'descriptions',
+    control: form.control,
   })
 
   useEffect(() => {
@@ -134,7 +152,7 @@ const Page = () => {
     // eslint-disable-next-line
   }, [dialogOpen])
 
-  const lessonPlans = [
+  const lessonTypes = [
     { label: 'WEEKLY', value: 'WEEKLY' },
     { label: 'INTENSIVELY', value: 'INTENSIVELY' },
   ]
@@ -152,11 +170,11 @@ const Page = () => {
       <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
         <CustomFormField
           form={form}
-          name='lessonPlan'
-          label='Lesson Plan'
-          placeholder='Lesson Plan'
+          name='lessonType'
+          label='Lesson Type'
+          placeholder='Lesson Type'
           fieldType='command'
-          data={lessonPlans}
+          data={lessonTypes}
         />
         <CustomFormField
           form={form}
@@ -168,9 +186,9 @@ const Page = () => {
         />
         <CustomFormField
           form={form}
-          name='lessonPreference'
-          label='Lesson Preference'
-          placeholder='Lesson Preference'
+          name='lessonPreferences'
+          label='Lesson Preferences'
+          placeholder='Lesson Preferences'
           fieldType='command'
           data={LessonPreferences}
         />
@@ -204,7 +222,8 @@ const Page = () => {
           placeholder='Instructor Price'
           type='number'
         />
-        <div className='hidden md:flex'></div>
+      </div>
+      <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
         <CustomFormField
           form={form}
           name='ultimateTheoryPackage'
@@ -226,16 +245,44 @@ const Page = () => {
           placeholder='Fast Tracked Drive Test'
           fieldType='checkbox'
         />
-        <div className='hidden md:flex'></div>
-        <CustomFormField
-          form={form}
-          name='description'
-          label='Description'
-          placeholder='Description'
-          cols={3}
-          rows={3}
-        />
       </div>
+
+      <div className='border p-2 my-2 bg-gray-100 rounded'>
+        {formArray.fields.map((field, index) => (
+          <div
+            key={field.id}
+            className='flex justify-between items-center gap-x-2'
+          >
+            <div className='w-full'>
+              <CustomFormField
+                form={form}
+                name={`descriptions.${index}.description`}
+                // label={`#${index + 1} Description`}
+                placeholder='Description'
+                type='text'
+              />
+            </div>
+            <Button
+              type='button'
+              variant='destructive'
+              onClick={() => formArray.remove(index)}
+              size='sm'
+              className='size-9 mt-2s'
+            >
+              <FaX />
+            </Button>
+          </div>
+        ))}
+      </div>
+
+      <Button
+        type='button'
+        onClick={() => formArray.append({ description: '' })}
+        className='gap-x-1'
+        size='sm'
+      >
+        <FaPlus /> Append
+      </Button>
     </Form>
   )
 
@@ -266,6 +313,7 @@ const Page = () => {
         submitHandler={onSubmit}
         label={label}
         edit={edit}
+        height='h-[80vh]'
         width='md:min-w-[600px]'
       />
 
