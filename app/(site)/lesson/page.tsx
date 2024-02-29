@@ -15,7 +15,7 @@ import RTable from '@/components/RTable'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
 import { Form } from '@/components/ui/form'
-import CustomFormField from '@/components/ui/CustomForm'
+import CustomFormField, { MultiSelect } from '@/components/ui/CustomForm'
 import { TopLoadingBar } from '@/components/TopLoadingBar'
 import { columns } from './columns'
 import useDataStore from '@/zustand/dataStore'
@@ -29,7 +29,7 @@ const FormSchema = z.object({
   ultimateTheoryPackage: z.boolean().optional(),
   fastTrackedTheoryTest: z.boolean().optional(),
   fastTrackedDriveTest: z.boolean().optional(),
-  lessonPreferences: z.string(),
+  lessonPreferences: z.array(z.string()),
   previousDrivingExperience: z.string(),
   status: z.string(),
   deposit: z.string(),
@@ -50,6 +50,9 @@ const Page = () => {
   const [id, setId] = useState<string | null>(null)
   const [edit, setEdit] = useState(false)
   const [q, setQ] = useState('')
+  const [selectedLessonPreference, setSelectedLessonPreference] = useState<
+    { label: string; value: string }[]
+  >([])
 
   const path = useAuthorization()
   const router = useRouter()
@@ -89,7 +92,20 @@ const Page = () => {
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
-      descriptions: [{ description: '' }],
+      ultimateTheoryPackage: false,
+      fastTrackedTheoryTest: false,
+      fastTrackedDriveTest: false,
+      previousDrivingExperience: '',
+      transmissionType: '',
+      lessonType: '',
+      status: '',
+      instructorPrice: '',
+      deposit: '',
+      descriptions: [
+        {
+          description: '',
+        },
+      ],
     },
   })
 
@@ -136,6 +152,22 @@ const Page = () => {
       // @ts-ignore
       form.setValue(k, item?.[k])
     })
+    form.setValue('deposit', `${item?.deposit}`)
+    form.setValue('instructorPrice', `${item?.instructorPrice}`)
+
+    // console.log(item)
+    const lessonsPref = item?.lessonPreferences?.map((item) => ({
+      label: item,
+      value: item,
+    }))
+
+    setSelectedLessonPreference(lessonsPref)
+
+    form.setValue(
+      'descriptions',
+      // @ts-ignore
+      item?.descriptions?.map((item) => ({ description: item }))
+    )
   }
 
   const deleteHandler = (id: any) => deleteApi?.mutateAsync(id)
@@ -148,6 +180,7 @@ const Page = () => {
       form.reset()
       setEdit(false)
       setId(null)
+      setSelectedLessonPreference([])
     }
     // eslint-disable-next-line
   }, [dialogOpen])
@@ -164,6 +197,18 @@ const Page = () => {
     { label: 'ACTIVE', value: 'ACTIVE' },
     { label: 'INACTIVE', value: 'INACTIVE' },
   ]
+
+  let multiLessonPreference = React.useMemo(() => {
+    const onlyValues = selectedLessonPreference?.map((item) => item.value)
+
+    const uniqueData = LessonPreferences?.filter(
+      (item) => !onlyValues?.includes(item.value)
+    )
+
+    return uniqueData
+
+    // eslint-disable-next-line
+  }, [edit, LessonPreferences])
 
   const formFields = (
     <Form {...form}>
@@ -184,13 +229,14 @@ const Page = () => {
           fieldType='command'
           data={transmissionTypes}
         />
-        <CustomFormField
+        <MultiSelect
           form={form}
           name='lessonPreferences'
           label='Lesson Preferences'
-          placeholder='Lesson Preferences'
-          fieldType='command'
-          data={LessonPreferences}
+          data={multiLessonPreference}
+          selected={selectedLessonPreference}
+          setSelected={setSelectedLessonPreference}
+          edit={edit}
         />
         <CustomFormField
           form={form}

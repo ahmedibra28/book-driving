@@ -24,41 +24,32 @@ export async function PUT(req: Request, { params }: Params) {
       status,
       deposit,
       instructorPrice,
-      description,
+      descriptions,
     } = await req.json()
 
     const lessonObj = await prisma.lesson.findUnique({
       where: { id: params.id },
-      include: {
-        description: true,
-      },
     })
 
     if (!lessonObj) return getErrorResponse('Lesson not found', 404)
 
-    await prisma.$transaction(async (prisma) => {
-      await prisma.description.deleteMany({
-        where: { id: { in: lessonObj.description.map((lesson) => lesson.id) } },
-      })
-
-      await prisma.lesson.update({
-        where: { id: params.id },
-        data: {
-          lessonType,
-          transmissionType,
-          ultimateTheoryPackage,
-          fastTrackedTheoryTest,
-          fastTrackedDriveTest,
-          lessonPreferences,
-          previousDrivingExperience,
-          status,
-          deposit,
-          instructorPrice,
-          description: {
-            create: description,
-          },
-        },
-      })
+    await prisma.lesson.update({
+      where: { id: params.id },
+      data: {
+        lessonType,
+        transmissionType,
+        ultimateTheoryPackage,
+        fastTrackedTheoryTest,
+        fastTrackedDriveTest,
+        lessonPreferences,
+        previousDrivingExperience,
+        status,
+        deposit: parseInt(deposit),
+        instructorPrice: parseInt(instructorPrice),
+        descriptions: descriptions?.map(
+          (item: { description: string }) => item.description
+        ),
+      },
     })
 
     return NextResponse.json({

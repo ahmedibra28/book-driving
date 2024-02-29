@@ -468,13 +468,10 @@ export const MultiSelect = ({
   }, [selected, form])
 
   return (
-    <React.Fragment>
+    <div className='grid grid-cols-1'>
       {label && <Label className='mb-2'>{label}</Label>}
 
-      <Command
-        onKeyDown={handleKeyDown}
-        className='mb-2 overflow-visible bg-transparent'
-      >
+      <Command onKeyDown={handleKeyDown} className=''>
         <div className='bg-whites group rounded-md border border-input px-3 py-2 text-sm ring-offset-background focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2'>
           <div className='flex flex-wrap gap-1'>
             {selected.map((item) => {
@@ -541,7 +538,7 @@ export const MultiSelect = ({
       <FormMessage className='-mt-2 mb-2 text-xs'>
         {form?.formState.errors?.[name]?.message as string}
       </FormMessage>
-    </React.Fragment>
+    </div>
   )
 }
 

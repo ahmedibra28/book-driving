@@ -3,6 +3,7 @@ import { getErrorResponse } from '@/lib/helpers'
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma.db'
 import type { LessonType as ILessonType } from '@prisma/client'
+import { LessonPreferences } from '@/lib/enums'
 
 export async function GET(req: Request) {
   try {
@@ -62,8 +63,17 @@ export async function POST(req: NextApiRequestExtended) {
       status,
       deposit,
       instructorPrice,
-      description,
+      descriptions,
     } = await req.json()
+
+    lessonPreferences?.map((item: string) => {
+      if (!LessonPreferences?.map((v) => v.value).includes(item)) {
+        throw {
+          message: 'Invalid lesson preferences',
+          status: 400,
+        }
+      }
+    })
 
     const lessonObj = await prisma.lesson.create({
       data: {
@@ -75,11 +85,11 @@ export async function POST(req: NextApiRequestExtended) {
         lessonPreferences,
         previousDrivingExperience,
         status,
-        deposit,
-        instructorPrice,
-        description: {
-          create: description,
-        },
+        deposit: parseInt(deposit),
+        instructorPrice: parseInt(instructorPrice),
+        descriptions: descriptions?.map(
+          (item: { description: string }) => item.description
+        ),
         createdById: req.user.id,
       },
     })
