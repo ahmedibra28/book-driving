@@ -25,7 +25,6 @@ import {
   MenubarSubContent,
   MenubarSubTrigger,
 } from '@/components/ui/menubar'
-import { FaBell } from 'react-icons/fa6'
 
 const Navigation = () => {
   const { userInfo } = useUserInfoStore((state) => state)
@@ -53,9 +52,6 @@ const Navigation = () => {
     <>
       <div className='hidden lg:block flex-row'>
         <ul className='px-1 flex space-x-4 items-center'>
-          <Link href='/instructors'>
-            <FaBell />
-          </Link>
           {menu.map((item: any, i: number) => (
             <Fragment key={i}>
               {!item?.children && <Link href={item.path}>{item.name}</Link>}
@@ -144,14 +140,6 @@ const Navigation = () => {
                 <MenubarItem>
                   <Link href='/account/profile' className='justify-between'>
                     Profile
-                  </Link>
-                </MenubarItem>
-                <MenubarItem>
-                  <Link
-                    href='/instructors'
-                    className='flex flex-row items-center justify-between gap-x-1'
-                  >
-                    <FaBell /> Notifications
                   </Link>
                 </MenubarItem>
                 {menu.map((item: any, i: number) => (

@@ -82,7 +82,7 @@ model Lesson {
   id                        String                    @id @default(dbgenerated("nanoid()")) @db.VarChar(21)
   lessonType                LessonType
   transmissionType          TransmissionType
-  ultimateTHeoryPackage     Boolean
+  ultimateTheoryPackage     Boolean
   fastTrackedTheoryTest     Boolean
   fastTrackedDriveTest      Boolean
   lessonPreferences         LessonPreferences

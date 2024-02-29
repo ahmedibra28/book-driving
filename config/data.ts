@@ -38,7 +38,8 @@ const profile = {
 const sort = {
   hidden: 0,
   profile: 1,
-  admin: 2,
+  admin: 3,
+  normal: 2,
 }
 
 const clientPermissions = [
@@ -110,8 +111,8 @@ const clientPermissions = [
     id: 'HnCMgsT54kcTRYlJGsOC4',
     name: 'Instructor',
     path: '/instructors',
-    menu: 'hidden',
-    sort: sort.hidden,
+    menu: 'normal',
+    sort: sort.normal,
     description: 'Instructor page',
   },
   {
@@ -121,6 +122,14 @@ const clientPermissions = [
     menu: 'hidden',
     sort: sort.hidden,
     description: 'Instructor details page',
+  },
+  {
+    id: 'Yu9Dl2ZN-Nra2_iNL9vV1',
+    name: 'Lesson',
+    path: '/lesson',
+    menu: 'normal',
+    sort: sort.normal,
+    description: 'Lesson page',
   },
 ]
 
@@ -326,6 +335,36 @@ const permissions = [
     route: '/api/instructors/:id',
     name: 'Instructor',
     method: 'PUT',
+  },
+
+  //   Lesson
+  {
+    id: '4IDmkHb9FngwBuXKqXXFP',
+    description: 'Lessons',
+    route: '/api/lessons',
+    name: 'Lessons',
+    method: 'GET',
+  },
+  {
+    id: 'daHLgxJ2GNqPhgmhimc-v',
+    description: 'Lesson',
+    route: '/api/lessons',
+    name: 'Lessons',
+    method: 'POST',
+  },
+  {
+    id: 'OA50KMYoFjbXm5MZZU-bD',
+    description: 'Lesson',
+    route: '/api/lessons/:id',
+    name: 'Lessons',
+    method: 'PUT',
+  },
+  {
+    id: 'wABl6CKQc1tA_-wcYD6xg',
+    description: 'Lesson',
+    route: '/api/lessons/:id',
+    name: 'Lessons',
+    method: 'DELETE',
   },
 ]
 
