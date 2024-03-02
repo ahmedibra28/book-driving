@@ -95,6 +95,7 @@ export interface FormProps {
   url?: string
   items?: ListItem[]
   disabled?: boolean
+  labelTextColor?: string
 }
 export interface FormButtonProp {
   label: string
@@ -107,6 +108,7 @@ export default function CustomFormField({
   form,
   name,
   label,
+  labelTextColor = 'text-gray-700',
   ...props
 }: FormProps) {
   const [search, setSearch] = React.useState('')
@@ -147,7 +149,7 @@ export default function CustomFormField({
           <FormItem className='mb-3 flex flex-col'>
             {items?.map((item, i) => (
               <div key={i} className='mb-2 gap-y-2 bg-slate-100 p-3'>
-                <FormLabel className='mb-2 pb-3 font-bold text-gray-700'>
+                <FormLabel className={`mb-2 pb-3 font-bold ${labelTextColor}`}>
                   {item.label}
                 </FormLabel>
                 {item?.children?.map((child, childId) => (
@@ -189,7 +191,7 @@ export default function CustomFormField({
             <FormMessage className='text-xs' />
           </FormItem>
         ) : props?.fieldType === 'checkbox' ? (
-          <FormItem className='mb-3 flex flex-row items-start space-x-3 space-y-0 rounded-md border p-3 '>
+          <FormItem className='mb-3 flex flex-row items-start space-x-3 space-y-0 rounded-md border p-3 bg-white'>
             <FormControl>
               <Checkbox
                 checked={field.value}
@@ -202,7 +204,7 @@ export default function CustomFormField({
           </FormItem>
         ) : (
           <FormItem className='mb-3 flex flex-col'>
-            <FormLabel className='text-gray-700'>{label}</FormLabel>
+            <FormLabel className={`${labelTextColor}`}>{label}</FormLabel>
 
             {props?.fieldType === 'command' ? (
               <Popover>
@@ -413,6 +415,7 @@ export const MultiSelect = ({
   label,
   form,
   name,
+  labelTextColor = 'text-gray-700',
 }: {
   data: Prop[]
   selected: Prop[]
@@ -421,6 +424,7 @@ export const MultiSelect = ({
   form?: UseFormReturn<any>
   name: string
   edit?: boolean
+  labelTextColor?: string
 }) => {
   const inputRef = React.useRef<HTMLInputElement>(null)
   const [open, setOpen] = React.useState(false)
@@ -469,10 +473,13 @@ export const MultiSelect = ({
 
   return (
     <div className='grid grid-cols-1'>
-      {label && <Label className='mb-2'>{label}</Label>}
+      {label && <Label className={`mb-2 ${labelTextColor}`}>{label}</Label>}
 
-      <Command onKeyDown={handleKeyDown} className=''>
-        <div className='bg-whites group rounded-md border border-input px-3 py-2 text-sm ring-offset-background focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2'>
+      <Command
+        onKeyDown={handleKeyDown}
+        className='mb-2 overflow-visible bg-transparent'
+      >
+        <div className='bg-whites group rounded-md border border-input px-3 py-2 text-sm ring-offset-background focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 bg-white'>
           <div className='flex flex-wrap gap-1'>
             {selected.map((item) => {
               return (
@@ -547,10 +554,6 @@ export const ActionButton = ({
   isPending,
   deleteHandler,
   original,
-  handleUpdate,
-  upgradeClass,
-  navigateToExam,
-  source,
 }: {
   editHandler?: (item: any) => void
   isPending?: boolean
@@ -558,16 +561,6 @@ export const ActionButton = ({
   modal?: string
   original?: any
   formChildren?: React.ReactNode
-  upgradeClass?: (id: string) => void
-  navigateToExam?: boolean
-  source?: string
-  handleUpdate?: ({
-    id,
-    status,
-  }: {
-    id: string
-    status: 'PAID' | 'UNPAID'
-  }) => void
 }) => {
   const { setDialogOpen } = useDataStore((state) => state)
 

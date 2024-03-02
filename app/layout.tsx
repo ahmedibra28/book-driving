@@ -41,8 +41,8 @@ export default function RootLayout({
             </div>
             <Navigation />
           </div>
-          <div className='max-w-6xl mx-auto px-2'>
-            <main className='flex min-h-[85.5vh] flex-col'>{children}</main>
+          <div>
+            <main className='flex min-h-[84vh] flex-col'>{children}</main>
           </div>
           <Footer />
         </Providers>

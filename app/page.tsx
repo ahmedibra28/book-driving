@@ -1,5 +1,6 @@
 'use client'
 import FormContainer from '@/components/FormContainer'
+import Header from '@/components/Header'
 import useApi from '@/hooks/useApi'
 import useUserInfoStore from '@/zustand/userStore'
 import { useRouter } from 'next/navigation'
@@ -29,14 +30,8 @@ export default function Home() {
   }, [getApi?.isSuccess, userInfo.id])
 
   return (
-    <FormContainer title='Home'>
-      <h1 className='text-gray-500 text-center'>
-        Welcome to
-        <a href='https://nextjs.org' target='_blank'>
-          <strong> Next.JS 14 </strong>
-        </a>
-        book-driving
-      </h1>
-    </FormContainer>
+    <div className='max-w-7xls mx-auto'>
+      <Header />
+    </div>
   )
 }
