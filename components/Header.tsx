@@ -1,6 +1,6 @@
 'use client'
 import Image from 'next/image'
-import React, { useState } from 'react'
+import React, { useEffect, useState, useTransition } from 'react'
 import {
   Card,
   CardContent,
@@ -17,7 +17,10 @@ import CustomFormField, {
   MultiSelect,
 } from '@/components/ui/CustomForm'
 import useBookingStore from '@/zustand/bookingStore'
-import { LessonPreferences } from '@/lib/enums'
+import { LessonPreferences, PreviousDrivingExperience } from '@/lib/enums'
+import { useRouter } from 'next/navigation'
+import getLessons from '@/actions/getLessons'
+import Message from '@/components/Message'
 
 export default function Header() {
   const { setBooking, booking, step, setStep } = useBookingStore(
@@ -26,6 +29,10 @@ export default function Header() {
   const [selectedLessonPreference, setSelectedLessonPreference] = useState<
     { label: string; value: string }[]
   >([])
+  const [error, setError] = useState<string | null>(null)
+
+  const router = useRouter()
+  const [isPending, startTransition] = useTransition()
 
   const FormSchema = z.object({
     ...(step === 1 && {
@@ -39,9 +46,11 @@ export default function Header() {
     ...(step === 2 && {
       lessonType: z.string(),
       transmissionType: z.string(),
-      fastTrackedTheoryTest: z.boolean(),
-      fastTrackedDriveTest: z.boolean(),
+      fastTrackedTheoryTest: z.boolean().optional(),
+      fastTrackedDriveTest: z.boolean().optional(),
+      ultimateTheoryPackage: z.boolean().optional(),
       lessonPreferences: z.array(z.string()),
+      previousDrivingExperience: z.string(),
     }),
   })
 
@@ -49,17 +58,51 @@ export default function Header() {
     resolver: zodResolver(FormSchema),
   })
 
+  const handleGetLessons = () => {
+    startTransition(async () => {
+      getLessons(booking)
+        .then((res) => {
+          console.log({ res })
+        })
+        .catch((error) => {
+          setError(String(error))
+          setTimeout(() => {
+            setError(null)
+          }, 5000)
+        })
+    })
+  }
+
   const onSubmit = (values: z.infer<typeof FormSchema>) => {
     if (step === 1) {
       setStep(step + 1)
-      setBooking(values)
+      setBooking(values as any)
     }
 
     if (step === 2) {
-      setBooking(values)
-      console.log({ booking })
+      setBooking(values as any)
+      handleGetLessons()
+      // return router.push('/booking')
     }
   }
+
+  useEffect(() => {
+    if (router) {
+      Object.keys(booking)?.forEach((k) => {
+        // @ts-ignore
+        form.setValue(k, booking?.[k])
+      })
+
+      const lessonsPref =
+        booking?.lessonPreferences?.map((item) => ({
+          label: item,
+          value: item,
+        })) || []
+
+      setSelectedLessonPreference(lessonsPref)
+    }
+    // eslint-disable-next-line
+  }, [router])
 
   const lessonTypes = [
     { label: 'WEEKLY', value: 'WEEKLY' },
@@ -77,6 +120,7 @@ export default function Header() {
 
   return (
     <div className='relative bg-gradient-to-r from-black to-black'>
+      {error && <Message value={error} />}
       <Image
         src='https://plus.unsplash.com/premium_photo-1682088541985-5b226a4867e5?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'
         alt='hero'
@@ -89,8 +133,12 @@ export default function Header() {
           <CardHeader>
             <CardTitle>Find a Driving Instructor</CardTitle>
             <CardDescription className='text-gray-200'>
-              Enter your postcode and mobile number to find a driving instructor
-              in your area
+              {step === 1
+                ? 'Enter your postcode and mobile number to find a driving instructor in your area'
+                : 'Please fill out the form below to book a driving lesson'}
+            </CardDescription>
+            <CardDescription className='text-gray-200'>
+              (Step {step} / 2)
             </CardDescription>
           </CardHeader>
           <CardContent className='text-start'>
@@ -150,30 +198,50 @@ export default function Header() {
                       edit={false}
                       labelTextColor='text-white'
                     />
-                    <div className='space-y-7 my-4'>
-                      <CustomFormField
-                        form={form}
-                        name='fastTrackedTheoryTest'
-                        label='Fast Tracked Theory Test'
-                        placeholder='Fast Tracked Theory Test'
-                        fieldType='checkbox'
-                        labelTextColor='text-white'
-                      />
-                      <CustomFormField
-                        form={form}
-                        name='fastTrackedDriveTest'
-                        label='Fast Tracked Drive Test'
-                        placeholder='Fast Tracked Drive Test'
-                        fieldType='checkbox'
-                        labelTextColor='text-white'
-                      />
+                    <CustomFormField
+                      form={form}
+                      name='previousDrivingExperience'
+                      label='Previous Driving Experience'
+                      placeholder='Previous Driving Experience'
+                      fieldType='command'
+                      data={PreviousDrivingExperience}
+                      labelTextColor='text-white'
+                    />
+                    <div className='space-y-7 my-4 mt-7'>
+                      <div className='grid grid-cols-1 lg:grid-cols-2 gap-2'>
+                        <CustomFormField
+                          form={form}
+                          name='fastTrackedTheoryTest'
+                          label='Fast Tracked Theory Test'
+                          placeholder='Fast Tracked Theory Test'
+                          fieldType='checkbox'
+                          labelTextColor='text-white'
+                        />
+                        {form.watch('fastTrackedTheoryTest') && (
+                          <CustomFormField
+                            form={form}
+                            name='ultimateTheoryPackage'
+                            label='Ultimate Theory Package'
+                            placeholder='Ultimate Theory Package'
+                            fieldType='checkbox'
+                          />
+                        )}
+                        <CustomFormField
+                          form={form}
+                          name='fastTrackedDriveTest'
+                          label='Fast Tracked Drive Test'
+                          placeholder='Fast Tracked Drive Test'
+                          fieldType='checkbox'
+                          labelTextColor='text-white'
+                        />
+                      </div>
                     </div>
                   </>
                 )}
 
                 <div className='space-x-5 text-center'>
                   <FormButton
-                    loading={false}
+                    loading={isPending}
                     label='Back'
                     type='button'
                     className='w-32'
@@ -182,7 +250,7 @@ export default function Header() {
                     disabled={step === 1}
                   />
                   <FormButton
-                    loading={false}
+                    loading={isPending}
                     label={step === 2 ? 'Submit' : 'Next'}
                     type='submit'
                     className='w-32 bg-transparent text-white'

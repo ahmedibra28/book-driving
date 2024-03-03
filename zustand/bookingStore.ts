@@ -8,7 +8,9 @@ export type Booking = {
   transmissionType?: string
   fastTrackedTheoryTest?: boolean
   fastTrackedDriveTest?: boolean
+  ultimateTheoryPackage?: boolean
   lessonPreferences?: string[]
+  previousDrivingExperience?: string
 }
 
 type BookingStore = {
@@ -26,7 +28,9 @@ const useBookingStore = create<BookingStore>((set) => ({
     transmissionType: '',
     fastTrackedTheoryTest: false,
     fastTrackedDriveTest: false,
+    ultimateTheoryPackage: false,
     lessonPreferences: [],
+    previousDrivingExperience: '',
   },
   step: 1,
   setBooking: (booking) => {

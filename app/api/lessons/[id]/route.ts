@@ -64,25 +64,11 @@ export async function DELETE(req: Request, { params }: Params) {
   try {
     await isAuth(req, params)
 
-    const lessonObj = await prisma.lesson.findUnique({
+    const lessonObj = await prisma.lesson.delete({
       where: { id: params.id },
-      include: {
-        description: true,
-      },
     })
 
     if (!lessonObj) return getErrorResponse('Lesson not removed', 404)
-
-    await prisma.$transaction(async (prisma) => {
-      await prisma.description.deleteMany({
-        where: { id: { in: lessonObj.description.map((lesson) => lesson.id) } },
-      })
-      const lesson = await prisma.lesson.delete({
-        where: { id: params.id },
-      })
-
-      if (!lesson) return getErrorResponse('Lesson not removed', 404)
-    })
 
     return NextResponse.json({
       ...lessonObj,

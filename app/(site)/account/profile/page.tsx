@@ -17,8 +17,6 @@ import CustomFormField, { FormButton, Upload } from '@/components/ui/CustomForm'
 import { Card, CardContent } from '@/components/ui/card'
 
 const Profile = () => {
-  const [fileLink, setFileLink] = React.useState<string[]>([])
-
   const path = useAuthorization()
   const router = useRouter()
 
@@ -46,6 +44,7 @@ const Profile = () => {
       name: z.string(),
       address: z.string(),
       mobile: z.number(),
+      image: z.array(z.string()).optional(),
       bio: z.string(),
       password: z.string().refine((val) => val.length === 0 || val.length > 6, {
         message: "Password can't be less than 6 characters",
@@ -77,7 +76,7 @@ const Profile = () => {
     updateApi?.mutateAsync({
       ...values,
       id: getApi?.data?.id,
-      image: fileLink ? fileLink[0] : getApi?.data?.image,
+      image: values?.image?.[0] || getApi?.data?.image,
     })
   }
 
@@ -92,7 +91,7 @@ const Profile = () => {
         email,
         image,
       })
-      setFileLink([])
+      // setFileLink([])
     }
     // eslint-disable-next-line
   }, [updateApi?.isSuccess])
@@ -102,7 +101,7 @@ const Profile = () => {
     form.setValue('address', !getApi?.isPending ? getApi?.data?.address : '')
     form.setValue('mobile', !getApi?.isPending ? getApi?.data?.mobile : '')
     form.setValue('bio', !getApi?.isPending ? getApi?.data?.bio : '')
-    setFileLink(!getApi?.isPending ? [getApi?.data?.image] : [])
+    form.setValue('image', !getApi?.isPending ? [getApi?.data?.image] : [])
     // eslint-disable-next-line
   }, [getApi?.isPending, form.setValue])
 
@@ -187,16 +186,16 @@ const Profile = () => {
                 <div className='w-full md:w-[48%] lg:w-[32%]'>
                   <Upload
                     label='Image'
-                    setFileLink={setFileLink}
-                    fileLink={fileLink}
+                    form={form}
                     fileType='image'
+                    name='image'
                   />
 
-                  {fileLink.length > 0 && (
+                  {form.watch('image') && (
                     <div className='avatar text-center flex justify-center items-end mt-2'>
                       <div className='w-12 mask mask-squircle'>
                         <Image
-                          src={fileLink?.[0]}
+                          src={form.watch('image')?.[0] || ''}
                           alt='avatar'
                           width={50}
                           height={50}

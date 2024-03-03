@@ -28,6 +28,10 @@ const nextConfig = {
             {
                 protocol: 'https',
                 hostname: 'plus.unsplash.com'
+            },
+            {
+                protocol: 'https',
+                hostname: 'farshaxan.blr1.cdn.digitaloceanspaces.com'
             }
         ]
     }
