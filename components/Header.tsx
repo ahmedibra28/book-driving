@@ -16,16 +16,19 @@ import CustomFormField, {
   FormButton,
   MultiSelect,
 } from '@/components/ui/CustomForm'
-import useBookingStore from '@/zustand/bookingStore'
+import useBookingStore, { Booking } from '@/zustand/bookingStore'
 import { LessonPreferences, PreviousDrivingExperience } from '@/lib/enums'
 import { useRouter } from 'next/navigation'
 import getLessons from '@/actions/getLessons'
 import Message from '@/components/Message'
+import useLessonStore from '@/zustand/lessonStore'
 
 export default function Header() {
   const { setBooking, booking, step, setStep } = useBookingStore(
     (state) => state
   )
+  const { setLesson } = useLessonStore((state) => state)
+
   const [selectedLessonPreference, setSelectedLessonPreference] = useState<
     { label: string; value: string }[]
   >([])
@@ -58,14 +61,22 @@ export default function Header() {
     resolver: zodResolver(FormSchema),
   })
 
-  const handleGetLessons = () => {
+  const handleGetLessons = (book: Booking) => {
     startTransition(async () => {
-      getLessons(booking)
+      getLessons(book)
         .then((res) => {
-          console.log({ res })
+          if (!res || res?.length === 0) {
+            setError('No courses found')
+            setTimeout(() => {
+              setError(null)
+            }, 5000)
+          } else {
+            setLesson(res)
+            return router.push('/booking')
+          }
         })
         .catch((error) => {
-          setError(String(error))
+          setError('Something went wrong, please try again later')
           setTimeout(() => {
             setError(null)
           }, 5000)
@@ -81,8 +92,7 @@ export default function Header() {
 
     if (step === 2) {
       setBooking(values as any)
-      handleGetLessons()
-      // return router.push('/booking')
+      handleGetLessons({ ...booking, ...values } as Booking)
     }
   }
 

@@ -1,3 +1,4 @@
+import { FormatNumber } from '@/components/FormatNumber'
 import { ActionButton } from '@/components/ui/CustomForm'
 import DateTime from '@/lib/dateTime'
 
@@ -9,6 +10,7 @@ type Column = {
 
 export const columns = ({ editHandler, isPending, deleteHandler }: Column) => {
   return [
+    { header: 'Hours', accessorKey: 'hours', active: true },
     { header: 'Lesson', accessorKey: 'lessonType', active: true },
     { header: 'Transmission', accessorKey: 'transmissionType', active: true },
     {
@@ -36,11 +38,21 @@ export const columns = ({ editHandler, isPending, deleteHandler }: Column) => {
       accessorKey: 'previousDrivingExperience',
       active: false,
     },
-    { header: 'Deposit', accessorKey: 'deposit', active: false },
+    {
+      header: 'Deposit',
+      accessorKey: 'deposit',
+      active: true,
+      cell: ({ row: { original } }: any) => (
+        <FormatNumber value={original?.deposit} />
+      ),
+    },
     {
       header: 'Instructor Price',
       accessorKey: 'instructorPrice',
       active: true,
+      cell: ({ row: { original } }: any) => (
+        <FormatNumber value={original?.instructorPrice} />
+      ),
     },
     { header: 'Description', accessorKey: 'description', active: false },
     {

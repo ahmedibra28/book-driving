@@ -25,6 +25,7 @@ import type { User as IUser, Instructor as IInstructor } from '@prisma/client'
 import DateTime from '@/lib/dateTime'
 import ReactMarkdown from 'react-markdown'
 import { FileIcon } from 'lucide-react'
+import { TopLoadingBar } from '@/components/TopLoadingBar'
 
 const Profile = () => {
   const [step, setStep] = React.useState(1)
@@ -124,7 +125,9 @@ const Profile = () => {
       })
       form.reset()
 
-      router.push('/')
+      setTimeout(() => {
+        router.push('/')
+      }, 3000)
     }
     // eslint-disable-next-line
   }, [updateApi?.isSuccess])
@@ -134,7 +137,11 @@ const Profile = () => {
 
   useEffect(() => {
     if (getApi?.isSuccess && userInfo.role === 'INSTRUCTOR') {
-      if (['APPROVED', 'PENDING'].includes(status)) router.push('/')
+      if (['APPROVED', 'PENDING'].includes(status)) {
+        setTimeout(() => {
+          router.push('/')
+        }, 3000)
+      }
     }
 
     // eslint-disable-next-line
@@ -214,6 +221,7 @@ const Profile = () => {
       {updateApi?.isSuccess && <Message value={updateApi?.data?.message} />}
 
       {getApi?.isPending && <Spinner />}
+      <TopLoadingBar isFetching={getApi?.isFetching || getApi?.isPending} />
 
       <div className='bg-opacity-60 max-w-4xl mx-auto'>
         {profile?.instructor?.note && (
@@ -253,8 +261,16 @@ const Profile = () => {
                 </ol>
               </CardHeader>
             )}
-
           <CardContent className='space-y-6 py-5'>
+            {userInfo.role === 'INSTRUCTOR' &&
+              ['APPROVED', 'PENDING'].includes(status) && (
+                <>
+                  <Spinner />
+                  <CardDescription className='text-center'>
+                    Wait for admin to approve your account
+                  </CardDescription>
+                </>
+              )}
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)}>
                 {userInfo.role === 'INSTRUCTOR' &&

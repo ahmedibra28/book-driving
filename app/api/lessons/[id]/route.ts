@@ -14,6 +14,7 @@ export async function PUT(req: Request, { params }: Params) {
     await isAuth(req, params)
 
     const {
+      hours,
       lessonType,
       transmissionType,
       ultimateTheoryPackage,
@@ -36,6 +37,7 @@ export async function PUT(req: Request, { params }: Params) {
     await prisma.lesson.update({
       where: { id: params.id },
       data: {
+        hours: parseInt(hours),
         lessonType,
         transmissionType,
         ultimateTheoryPackage,

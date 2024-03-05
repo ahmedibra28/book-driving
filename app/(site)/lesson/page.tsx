@@ -24,6 +24,7 @@ import { Button } from '@/components/ui/button'
 import { FaPlus, FaX } from 'react-icons/fa6'
 
 const FormSchema = z.object({
+  hours: z.string(),
   lessonType: z.string(),
   transmissionType: z.string(),
   ultimateTheoryPackage: z.boolean().optional(),
@@ -92,6 +93,7 @@ const Page = () => {
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
+      hours: '',
       ultimateTheoryPackage: false,
       fastTrackedTheoryTest: false,
       fastTrackedDriveTest: false,
@@ -213,6 +215,13 @@ const Page = () => {
   const formFields = (
     <Form {...form}>
       <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+        <CustomFormField
+          form={form}
+          name='hours'
+          label='Hours'
+          placeholder='Hours'
+          type='number'
+        />
         <CustomFormField
           form={form}
           name='lessonType'

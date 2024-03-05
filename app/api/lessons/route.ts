@@ -53,6 +53,7 @@ export async function POST(req: NextApiRequestExtended) {
     await isAuth(req)
 
     const {
+      hours,
       lessonType,
       transmissionType,
       ultimateTheoryPackage,
@@ -77,6 +78,7 @@ export async function POST(req: NextApiRequestExtended) {
 
     const lessonObj = await prisma.lesson.create({
       data: {
+        hours: parseInt(hours),
         lessonType,
         transmissionType,
         ultimateTheoryPackage,
