@@ -17,8 +17,11 @@ import { Lesson } from '@/zustand/lessonStore'
 import { WordCapitalize } from '@/lib/capitalize'
 import { FormatNumber } from '../FormatNumber'
 import { FormButton } from './CustomForm'
+import { useRouter } from 'next/navigation'
 
 export default function LessonCard({ item }: { item: Lesson[0] }) {
+  const router = useRouter()
+
   return (
     <Card>
       <CardHeader>
@@ -97,6 +100,7 @@ export default function LessonCard({ item }: { item: Lesson[0] }) {
             icon={<FaCalendar />}
             variant='outline'
             label='Book Lesson'
+            onClick={() => router.push(`/booking/complete-details/${item?.id}`)}
           />
         </div>
       </CardFooter>

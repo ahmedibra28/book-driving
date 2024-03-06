@@ -17,13 +17,17 @@ import CustomFormField, {
   MultiSelect,
 } from '@/components/ui/CustomForm'
 import useBookingStore, { Booking } from '@/zustand/bookingStore'
-import { LessonPreferences, PreviousDrivingExperience } from '@/lib/enums'
+import {
+  DrivingExperience,
+  LessonPreferences,
+  PreviousDrivingExperience,
+} from '@/lib/enums'
 import { useRouter } from 'next/navigation'
 import getLessons from '@/actions/getLessons'
 import Message from '@/components/Message'
 import useLessonStore from '@/zustand/lessonStore'
 
-export default function Header() {
+export default function CompleteDetails() {
   const { setBooking, booking, step, setStep } = useBookingStore(
     (state) => state
   )
@@ -86,13 +90,13 @@ export default function Header() {
 
   const onSubmit = (values: z.infer<typeof FormSchema>) => {
     if (step === 1) {
-      setStep(step + 1)
-      setBooking(values as any)
+      // setStep(step + 1)
+      // setBooking(values as any)
     }
 
     if (step === 2) {
-      setBooking(values as any)
-      handleGetLessons({ ...booking, ...values } as Booking)
+      // setBooking(values as any)
+      // handleGetLessons({ ...booking, ...values } as Booking)
     }
   }
 
@@ -115,12 +119,22 @@ export default function Header() {
   }, [router])
 
   const lessonTypes = [
-    { label: 'Weekly', value: 'WEEKLY' },
-    { label: 'Intensively', value: 'INTENSIVELY' },
+    { label: 'WEEKLY', value: 'WEEKLY' },
+    { label: 'INTENSIVELY', value: 'INTENSIVELY' },
   ]
   const transmissionTypes = [
-    { label: 'Manual', value: 'MANUAL' },
-    { label: 'Automatic', value: 'AUTOMATIC' },
+    { label: 'MANUAL', value: 'MANUAL' },
+    { label: 'AUTOMATIC', value: 'AUTOMATIC' },
+  ]
+
+  const yesNoOptions = [
+    { label: 'Yes', value: 'true' },
+    { label: 'No', value: 'false' },
+  ]
+
+  const discountTests = [
+    { label: 'Add discounted test', value: 'true' },
+    { label: "No, don't add", value: 'false' },
   ]
 
   const multiLessonPreference = LessonPreferences?.filter(
@@ -129,27 +143,16 @@ export default function Header() {
   )
 
   return (
-    <div className='relative bg-gradient-to-r from-black to-black'>
+    <div className=''>
       {error && <Message value={error} />}
-      <Image
-        src='https://plus.unsplash.com/premium_photo-1682088541985-5b226a4867e5?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'
-        alt='hero'
-        width={1920}
-        height={1080}
-        className='object-cover opacity-50 shadow-lg lg:h-[84vh]'
-      />
-      <div className='container absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 transform space-y-3 text-center text-white md:space-y-4 lg:space-y-7'>
-        <Card className='lg:w-1/2 mx-auto bg-transparent text-white shadow-2xl shadow-white bg-gradient-to-r from-black/50 to-white/50'>
+      <div className='container space-y-3 text-center md:space-y-4 lg:space-y-7'>
+        <Card className='lg:w-1/2 mx-auto'>
           <CardHeader>
-            <CardTitle>Find a Driving Instructor</CardTitle>
-            <CardDescription className='text-gray-200'>
-              {step === 1
-                ? 'Enter your postcode and mobile number to find a driving instructor in your area'
-                : 'Please fill out the form below to book a driving lesson'}
+            <CardTitle>Complete Details</CardTitle>
+            <CardDescription>
+              Please fill out your details below to complete your booking
             </CardDescription>
-            <CardDescription className='text-gray-200'>
-              (Step {step} / 2)
-            </CardDescription>
+            <CardDescription>(Step {step} / 2)</CardDescription>
           </CardHeader>
           <CardContent className='text-start'>
             <form
@@ -157,28 +160,70 @@ export default function Header() {
               className='text-gray-700'
             >
               <Form {...form}>
-                {step === 1 && (
-                  <>
+                {/* {step === 1 && ( */}
+                <>
+                  <CustomFormField
+                    form={form}
+                    name='isPassedTheoryTest'
+                    label='Have you passed the theory test'
+                    placeholder='Have you passed the theory test'
+                    fieldType='command'
+                    data={yesNoOptions}
+                  />
+                  {form.watch('isPassedTheoryTest') === 'true' ? (
                     <CustomFormField
                       form={form}
-                      name='postalCode'
-                      label='Postal Code'
-                      placeholder='Postal code'
-                      type='text'
-                      labelTextColor='text-white'
+                      name='passedTheoryDate'
+                      label='Roughly what date did you pass your theory test?'
+                      placeholder='Roughly what date did you pass your theory test?'
+                      type='date'
                     />
-                    <CustomFormField
-                      form={form}
-                      name='mobile'
-                      label='Mobile'
-                      placeholder='Mobile'
-                      type='number'
-                      labelTextColor='text-white'
-                    />
-                  </>
-                )}
+                  ) : (
+                    <>
+                      <CardDescription>
+                        $5 OFF - RRP $40 - NOW $35
+                      </CardDescription>
+                      <CustomFormField
+                        form={form}
+                        name='discountTest'
+                        label='Are you sure you do not want us to book you a quicker
+                            theory test?'
+                        placeholder='Are you sure you do not want us to book you a quicker
+                            theory test?'
+                        fieldType='command'
+                        data={discountTests}
+                      />
+                    </>
+                  )}
 
-                {step === 2 && (
+                  <CustomFormField
+                    form={form}
+                    name='startDate'
+                    label='When would you like to start?'
+                    placeholder='When would you like to start?'
+                    type='date'
+                  />
+
+                  <CustomFormField
+                    form={form}
+                    name='practicalTestDate'
+                    label='Choose practical test date'
+                    placeholder='Choose practical test date'
+                    type='date'
+                  />
+
+                  <CustomFormField
+                    form={form}
+                    name='drivingExperience'
+                    label='Select driving experience'
+                    placeholder='Select driving experience'
+                    fieldType='command'
+                    data={DrivingExperience}
+                  />
+                </>
+                {/* )} */}
+
+                {step === 24 && (
                   <>
                     <CustomFormField
                       form={form}
@@ -263,7 +308,7 @@ export default function Header() {
                     loading={isPending}
                     label={step === 2 ? 'Submit' : 'Next'}
                     type='submit'
-                    className='w-32 bg-transparent text-white'
+                    className='w-32'
                     variant='outline'
                   />
                 </div>
