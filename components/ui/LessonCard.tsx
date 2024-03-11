@@ -18,9 +18,20 @@ import { WordCapitalize } from '@/lib/capitalize'
 import { FormatNumber } from '../FormatNumber'
 import { FormButton } from './CustomForm'
 import { useRouter } from 'next/navigation'
+import useBookingStore from '@/zustand/bookingStore'
 
 export default function LessonCard({ item }: { item: Lesson[0] }) {
   const router = useRouter()
+  const { setBooking, booking, setStep, step } = useBookingStore(
+    (state) => state
+  )
+
+  const handleSelect = (id?: string) => {
+    if (!id) return
+    setStep(step + 1)
+    setBooking({ ...booking, lessonId: id })
+    router.push(`/booking/complete-details/${id}`)
+  }
 
   return (
     <Card>
@@ -100,7 +111,7 @@ export default function LessonCard({ item }: { item: Lesson[0] }) {
             icon={<FaCalendar />}
             variant='outline'
             label='Book Lesson'
-            onClick={() => router.push(`/booking/complete-details/${item?.id}`)}
+            onClick={() => handleSelect(item?.id)}
           />
         </div>
       </CardFooter>

@@ -4,6 +4,8 @@ export type Booking = {
   readonly id?: string
   postalCode?: string
   mobile?: number | string
+
+  // Step 1
   lessonType?: string
   transmissionType?: string
   fastTrackedTheoryTest?: boolean
@@ -11,6 +13,25 @@ export type Booking = {
   ultimateTheoryPackage?: boolean
   lessonPreferences?: string[]
   previousDrivingExperience?: string
+
+  lessonId?: string
+
+  // Step 2
+  isPassedTheoryTest?: string
+  discountTest?: string
+  passedTheoryDate?: string
+  startDate?: Date
+  practicalTestDate?: string
+  drivingExperience?: string
+
+  // Step 3
+  referredFrom?: string
+  discountCode?: string
+  fullName?: string
+  contactNo?: string
+  email?: string
+  address?: string
+  licenseNo?: string
 }
 
 type BookingStore = {
@@ -24,6 +45,8 @@ const useBookingStore = create<BookingStore>((set) => ({
   booking: {
     postalCode: '',
     mobile: '',
+
+    // Step 1
     lessonType: '',
     transmissionType: '',
     fastTrackedTheoryTest: false,
@@ -31,6 +54,25 @@ const useBookingStore = create<BookingStore>((set) => ({
     ultimateTheoryPackage: false,
     lessonPreferences: [],
     previousDrivingExperience: '',
+
+    lessonId: '',
+
+    // Step 2
+    isPassedTheoryTest: '',
+    discountTest: '',
+    passedTheoryDate: '',
+    startDate: new Date(),
+    practicalTestDate: '',
+    drivingExperience: '',
+
+    // Step 3
+    referredFrom: '',
+    discountCode: '',
+    fullName: '',
+    contactNo: '',
+    email: '',
+    address: '',
+    licenseNo: '',
   },
   step: 1,
   setBooking: (booking) => {

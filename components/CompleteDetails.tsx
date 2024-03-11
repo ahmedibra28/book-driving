@@ -1,5 +1,5 @@
 'use client'
-import Image from 'next/image'
+
 import React, { useEffect, useState, useTransition } from 'react'
 import {
   Card,
@@ -12,16 +12,9 @@ import { z } from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Form } from '@/components/ui/form'
-import CustomFormField, {
-  FormButton,
-  MultiSelect,
-} from '@/components/ui/CustomForm'
+import CustomFormField, { FormButton } from '@/components/ui/CustomForm'
 import useBookingStore, { Booking } from '@/zustand/bookingStore'
-import {
-  DrivingExperience,
-  LessonPreferences,
-  PreviousDrivingExperience,
-} from '@/lib/enums'
+import { DrivingExperience, LessonPreferences, ReferredFrom } from '@/lib/enums'
 import { useRouter } from 'next/navigation'
 import getLessons from '@/actions/getLessons'
 import Message from '@/components/Message'
@@ -32,32 +25,34 @@ export default function CompleteDetails() {
     (state) => state
   )
   const { setLesson } = useLessonStore((state) => state)
-
-  const [selectedLessonPreference, setSelectedLessonPreference] = useState<
-    { label: string; value: string }[]
-  >([])
   const [error, setError] = useState<string | null>(null)
 
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
 
   const FormSchema = z.object({
-    ...(step === 1 && {
-      postalCode: z.string().refine((value) => value !== '', {
-        message: 'Postal code is required',
-      }),
-      mobile: z.string().refine((value) => value !== '', {
-        message: 'Mobile is required',
-      }),
+    ...(step === 3 && {
+      isPassedTheoryTest: z
+        .string()
+        .min(1, { message: 'Theory test result is required' }),
+      discountTest: z.string().optional(),
+      passedTheoryDate: z.string().optional(),
+      startDate: z.string().min(1, { message: 'Start date is required' }),
+      practicalTestDate: z
+        .string()
+        .min(1, { message: 'Practical test date is required' }),
+      drivingExperience: z
+        .string()
+        .min(1, { message: 'Driving experience is required' }),
     }),
-    ...(step === 2 && {
-      lessonType: z.string(),
-      transmissionType: z.string(),
-      fastTrackedTheoryTest: z.boolean().optional(),
-      fastTrackedDriveTest: z.boolean().optional(),
-      ultimateTheoryPackage: z.boolean().optional(),
-      lessonPreferences: z.array(z.string()),
-      previousDrivingExperience: z.string(),
+    ...(step === 4 && {
+      referredFrom: z.string().min(1, { message: 'Referred from is required' }),
+      discountCode: z.string().optional(),
+      fullName: z.string().min(1, { message: 'Full name is required' }),
+      contactNo: z.string().min(1, { message: 'Contact number is required' }),
+      email: z.string().email().min(1, { message: 'Email is required' }),
+      address: z.string().min(1, { message: 'Address is required' }),
+      licenseNo: z.string().min(1, { message: 'License number is required' }),
     }),
   })
 
@@ -65,7 +60,7 @@ export default function CompleteDetails() {
     resolver: zodResolver(FormSchema),
   })
 
-  const handleGetLessons = (book: Booking) => {
+  const handleCheckout = (book: Booking) => {
     startTransition(async () => {
       getLessons(book)
         .then((res) => {
@@ -89,14 +84,15 @@ export default function CompleteDetails() {
   }
 
   const onSubmit = (values: z.infer<typeof FormSchema>) => {
-    if (step === 1) {
-      // setStep(step + 1)
-      // setBooking(values as any)
+    if (step === 3) {
+      setStep(step + 1)
+      setBooking(values as any)
     }
 
-    if (step === 2) {
-      // setBooking(values as any)
-      // handleGetLessons({ ...booking, ...values } as Booking)
+    if (step === 4) {
+      setBooking(values as any)
+      console.log({ booking })
+      // handleCheckout({ ...booking, ...values } as Booking)
     }
   }
 
@@ -112,20 +108,9 @@ export default function CompleteDetails() {
           label: item,
           value: item,
         })) || []
-
-      setSelectedLessonPreference(lessonsPref)
     }
     // eslint-disable-next-line
   }, [router])
-
-  const lessonTypes = [
-    { label: 'WEEKLY', value: 'WEEKLY' },
-    { label: 'INTENSIVELY', value: 'INTENSIVELY' },
-  ]
-  const transmissionTypes = [
-    { label: 'MANUAL', value: 'MANUAL' },
-    { label: 'AUTOMATIC', value: 'AUTOMATIC' },
-  ]
 
   const yesNoOptions = [
     { label: 'Yes', value: 'true' },
@@ -137,11 +122,6 @@ export default function CompleteDetails() {
     { label: "No, don't add", value: 'false' },
   ]
 
-  const multiLessonPreference = LessonPreferences?.filter(
-    (item) =>
-      !selectedLessonPreference?.map((item) => item.value)?.includes(item.value)
-  )
-
   return (
     <div className=''>
       {error && <Message value={error} />}
@@ -152,7 +132,7 @@ export default function CompleteDetails() {
             <CardDescription>
               Please fill out your details below to complete your booking
             </CardDescription>
-            <CardDescription>(Step {step} / 2)</CardDescription>
+            <CardDescription>(Step {step} / 4)</CardDescription>
           </CardHeader>
           <CardContent className='text-start'>
             <form
@@ -160,136 +140,122 @@ export default function CompleteDetails() {
               className='text-gray-700'
             >
               <Form {...form}>
-                {/* {step === 1 && ( */}
-                <>
-                  <CustomFormField
-                    form={form}
-                    name='isPassedTheoryTest'
-                    label='Have you passed the theory test'
-                    placeholder='Have you passed the theory test'
-                    fieldType='command'
-                    data={yesNoOptions}
-                  />
-                  {form.watch('isPassedTheoryTest') === 'true' ? (
-                    <CustomFormField
-                      form={form}
-                      name='passedTheoryDate'
-                      label='Roughly what date did you pass your theory test?'
-                      placeholder='Roughly what date did you pass your theory test?'
-                      type='date'
-                    />
-                  ) : (
-                    <>
-                      <CardDescription>
-                        $5 OFF - RRP $40 - NOW $35
-                      </CardDescription>
-                      <CustomFormField
-                        form={form}
-                        name='discountTest'
-                        label='Are you sure you do not want us to book you a quicker
-                            theory test?'
-                        placeholder='Are you sure you do not want us to book you a quicker
-                            theory test?'
-                        fieldType='command'
-                        data={discountTests}
-                      />
-                    </>
-                  )}
-
-                  <CustomFormField
-                    form={form}
-                    name='startDate'
-                    label='When would you like to start?'
-                    placeholder='When would you like to start?'
-                    type='date'
-                  />
-
-                  <CustomFormField
-                    form={form}
-                    name='practicalTestDate'
-                    label='Choose practical test date'
-                    placeholder='Choose practical test date'
-                    type='date'
-                  />
-
-                  <CustomFormField
-                    form={form}
-                    name='drivingExperience'
-                    label='Select driving experience'
-                    placeholder='Select driving experience'
-                    fieldType='command'
-                    data={DrivingExperience}
-                  />
-                </>
-                {/* )} */}
-
-                {step === 24 && (
+                {step === 3 && (
                   <>
                     <CustomFormField
                       form={form}
-                      name='lessonType'
-                      label='Lesson Type'
-                      placeholder='Lesson Type'
+                      name='isPassedTheoryTest'
+                      label='Have you passed the theory test'
+                      placeholder='Have you passed the theory test'
                       fieldType='command'
-                      data={lessonTypes}
-                      labelTextColor='text-white'
+                      data={yesNoOptions}
+                    />
+                    {form.watch('isPassedTheoryTest') === 'true' ? (
+                      <CustomFormField
+                        form={form}
+                        name='passedTheoryDate'
+                        label='Roughly what date did you pass your theory test?'
+                        placeholder='Roughly what date did you pass your theory test?'
+                        type='date'
+                      />
+                    ) : (
+                      <>
+                        <CardDescription>
+                          $5 OFF - RRP $40 - NOW $35
+                        </CardDescription>
+                        <CustomFormField
+                          form={form}
+                          name='discountTest'
+                          label='Are you sure you do not want us to book you a quicker
+                            theory test?'
+                          placeholder='Are you sure you do not want us to book you a quicker
+                            theory test?'
+                          fieldType='command'
+                          data={discountTests}
+                        />
+                      </>
+                    )}
+
+                    <CustomFormField
+                      form={form}
+                      name='startDate'
+                      label='When would you like to start?'
+                      placeholder='When would you like to start?'
+                      type='date'
+                    />
+
+                    <CustomFormField
+                      form={form}
+                      name='practicalTestDate'
+                      label='Choose practical test date'
+                      placeholder='Choose practical test date'
+                      type='date'
+                    />
+
+                    <CustomFormField
+                      form={form}
+                      name='drivingExperience'
+                      label='Select driving experience'
+                      placeholder='Select driving experience'
+                      fieldType='command'
+                      data={DrivingExperience}
+                    />
+                  </>
+                )}
+
+                {step === 4 && (
+                  <>
+                    <CustomFormField
+                      form={form}
+                      name='fullName'
+                      label='Full Name'
+                      placeholder='Full Name'
+                      type='text'
                     />
                     <CustomFormField
                       form={form}
-                      name='transmissionType'
-                      label='Transmission Type'
-                      placeholder='Transmission Type'
-                      fieldType='command'
-                      data={transmissionTypes}
-                      labelTextColor='text-white'
-                    />
-                    <MultiSelect
-                      form={form}
-                      name='lessonPreferences'
-                      label='Lesson Preferences'
-                      data={multiLessonPreference}
-                      selected={selectedLessonPreference}
-                      setSelected={setSelectedLessonPreference}
-                      edit={false}
-                      labelTextColor='text-white'
+                      name='contactNo'
+                      label='Contact Number'
+                      placeholder='Contact Number'
+                      type='number'
                     />
                     <CustomFormField
                       form={form}
-                      name='previousDrivingExperience'
-                      label='Previous Driving Experience'
-                      placeholder='Previous Driving Experience'
-                      fieldType='command'
-                      data={PreviousDrivingExperience}
-                      labelTextColor='text-white'
+                      name='email'
+                      label='Email'
+                      placeholder='Email'
+                      type='email'
                     />
-                    <div className='space-y-7 my-4 mt-7'>
-                      <div className='grid grid-cols-1 lg:grid-cols-2 gap-2'>
-                        <CustomFormField
-                          form={form}
-                          name='fastTrackedTheoryTest'
-                          label='Fast Tracked Theory Test'
-                          placeholder='Fast Tracked Theory Test'
-                          fieldType='checkbox'
-                          labelTextColor='text-white'
-                        />
-                        {form.watch('fastTrackedTheoryTest') && (
-                          <CustomFormField
-                            form={form}
-                            name='ultimateTheoryPackage'
-                            label='Ultimate Theory Package'
-                            placeholder='Ultimate Theory Package'
-                            fieldType='checkbox'
-                          />
-                        )}
-                        <CustomFormField
-                          form={form}
-                          name='fastTrackedDriveTest'
-                          label='Fast Tracked Drive Test'
-                          placeholder='Fast Tracked Drive Test'
-                          fieldType='checkbox'
-                          labelTextColor='text-white'
-                        />
-                      </div>
+                    <CustomFormField
+                      form={form}
+                      name='address'
+                      label='Address'
+                      placeholder='Address'
+                      type='text'
+                    />
+                    <CustomFormField
+                      form={form}
+                      name='licenseNo'
+                      label='License'
+                      placeholder='License'
+                      type='text'
+                    />
+                    <div className='bg-gray-100 p-3 rounded mb-3'>
+                      <CustomFormField
+                        form={form}
+                        name='referredFrom'
+                        label='Referred From'
+                        placeholder='Referred From'
+                        fieldType='command'
+                        data={ReferredFrom}
+                      />
+                      <CustomFormField
+                        form={form}
+                        name='discountCode'
+                        label='Discount Code'
+                        placeholder='Discount Code'
+                        type='text'
+                      />
                     </div>
                   </>
                 )}
@@ -302,11 +268,11 @@ export default function CompleteDetails() {
                     className='w-32'
                     variant='destructive'
                     onClick={() => setStep(step - 1)}
-                    disabled={step === 1}
+                    disabled={step <= 3}
                   />
                   <FormButton
                     loading={isPending}
-                    label={step === 2 ? 'Submit' : 'Next'}
+                    label={step === 4 ? 'Checkout' : 'Next'}
                     type='submit'
                     className='w-32'
                     variant='outline'
