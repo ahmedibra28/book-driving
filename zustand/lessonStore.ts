@@ -24,6 +24,7 @@ export type Lesson = {
 type LessonStore = {
   lessons: Lesson
   setLesson: (lessons: Lesson) => void
+  reset: () => void
 }
 
 const useLessonStore = create<LessonStore>((set) => ({
@@ -47,6 +48,28 @@ const useLessonStore = create<LessonStore>((set) => ({
   setLesson: (lessons) => {
     return set(() => ({
       lessons,
+    }))
+  },
+
+  reset: () => {
+    return set(() => ({
+      lessons: [
+        {
+          id: '',
+          hours: 0,
+          lessonType: undefined,
+          transmissionType: undefined,
+          ultimateTheoryPackage: false,
+          fastTrackedTheoryTest: false,
+          fastTrackedDriveTest: false,
+          lessonPreferences: [],
+          previousDrivingExperience: undefined,
+          deposit: 0,
+          instructorPrice: 0,
+          descriptions: [],
+          createdAt: new Date(),
+        },
+      ],
     }))
   },
 }))

@@ -7,9 +7,11 @@ import { useRouter } from 'next/navigation'
 import React from 'react'
 import { FaArrowLeft } from 'react-icons/fa6'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
+import useBookingStore from '@/zustand/bookingStore'
 
 export default function Page() {
   const { lessons } = useLessonStore((state) => state)
+  const { setStep } = useBookingStore((state) => state)
 
   const router = useRouter()
 
@@ -20,7 +22,10 @@ export default function Page() {
         className='mb-3'
         label='Go Back'
         icon={<FaArrowLeft />}
-        onClick={() => router.back()}
+        onClick={() => {
+          setStep(2)
+          router.back()
+        }}
       />
       <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4'>
         {lessons?.length > 0 && lessons[0]?.id ? (

@@ -19,12 +19,17 @@ import { useRouter } from 'next/navigation'
 import getLessons from '@/actions/getLessons'
 import Message from '@/components/Message'
 import useLessonStore from '@/zustand/lessonStore'
+import bookLesson from '@/actions/bookLesson'
 
 export default function CompleteDetails() {
-  const { setBooking, booking, step, setStep } = useBookingStore(
-    (state) => state
-  )
-  const { setLesson } = useLessonStore((state) => state)
+  const {
+    setBooking,
+    booking,
+    step,
+    setStep,
+    reset: resetBooking,
+  } = useBookingStore((state) => state)
+  const { reset: resetLesson } = useLessonStore((state) => state)
   const [error, setError] = useState<string | null>(null)
 
   const router = useRouter()
@@ -62,20 +67,15 @@ export default function CompleteDetails() {
 
   const handleCheckout = (book: Booking) => {
     startTransition(async () => {
-      getLessons(book)
+      bookLesson(book)
         .then((res) => {
-          if (!res || res?.length === 0) {
-            setError('No courses found')
-            setTimeout(() => {
-              setError(null)
-            }, 5000)
-          } else {
-            setLesson(res)
-            return router.push('/booking')
-          }
+          console.log({ res })
+          resetLesson()
+          resetBooking()
+          return router.push('/booking/success')
         })
         .catch((error) => {
-          setError('Something went wrong, please try again later')
+          setError(error?.message)
           setTimeout(() => {
             setError(null)
           }, 5000)
@@ -91,8 +91,7 @@ export default function CompleteDetails() {
 
     if (step === 4) {
       setBooking(values as any)
-      console.log({ booking })
-      // handleCheckout({ ...booking, ...values } as Booking)
+      handleCheckout({ ...booking, ...values } as Booking)
     }
   }
 
@@ -102,12 +101,6 @@ export default function CompleteDetails() {
         // @ts-ignore
         form.setValue(k, booking?.[k])
       })
-
-      const lessonsPref =
-        booking?.lessonPreferences?.map((item) => ({
-          label: item,
-          value: item,
-        })) || []
     }
     // eslint-disable-next-line
   }, [router])
@@ -267,8 +260,13 @@ export default function CompleteDetails() {
                     type='button'
                     className='w-32'
                     variant='destructive'
-                    onClick={() => setStep(step - 1)}
-                    disabled={step <= 3}
+                    onClick={() => {
+                      if (step === 3) {
+                        router.back()
+                      }
+                      setStep(step - 1)
+                    }}
+                    disabled={step <= 1}
                   />
                   <FormButton
                     loading={isPending}

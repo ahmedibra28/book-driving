@@ -39,6 +39,7 @@ type BookingStore = {
   setBooking: (booking: Booking) => void
   step: number
   setStep: (step: number) => void
+  reset: () => void
 }
 
 const useBookingStore = create<BookingStore>((set) => ({
@@ -86,6 +87,44 @@ const useBookingStore = create<BookingStore>((set) => ({
   setStep: (step) => {
     return set(() => ({
       step,
+    }))
+  },
+
+  reset: () => {
+    return set(() => ({
+      step: 1,
+      booking: {
+        postalCode: '',
+        mobile: '',
+
+        // Step 1
+        lessonType: '',
+        transmissionType: '',
+        fastTrackedTheoryTest: false,
+        fastTrackedDriveTest: false,
+        ultimateTheoryPackage: false,
+        lessonPreferences: [],
+        previousDrivingExperience: '',
+
+        lessonId: '',
+
+        // Step 2
+        isPassedTheoryTest: '',
+        discountTest: '',
+        passedTheoryDate: '',
+        startDate: new Date(),
+        practicalTestDate: '',
+        drivingExperience: '',
+
+        // Step 3
+        referredFrom: '',
+        discountCode: '',
+        fullName: '',
+        contactNo: '',
+        email: '',
+        address: '',
+        licenseNo: '',
+      },
     }))
   },
 }))
