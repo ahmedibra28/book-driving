@@ -136,12 +136,15 @@ model Instructor {
 }
 
 model Student {
-  id        String @id @default(dbgenerated("nanoid()")) @db.VarChar(21)
-  fullName  String
-  contactNo String
-  email     String
-  address   String
-  licenseNo String
+  id         String  @id @default(dbgenerated("nanoid()")) @db.VarChar(21)
+  fullName   String
+  contactNo  String
+  email      String
+  address    String
+  address2   String?
+  town       String?
+  licenseNo  String
+  postalCode String
 
   transaction Transaction?
 
@@ -151,7 +154,7 @@ model Student {
 model Transaction {
   id                 String            @id @default(dbgenerated("nanoid()")) @db.VarChar(21)
   isPassedTheoryTest Boolean
-  passedTheoryDate   DateTime
+  passedTheoryDate   DateTime?
   discountTest       Float
   startDate          DateTime
   practicalTestDate  DateTime

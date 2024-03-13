@@ -14,9 +14,8 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { Form } from '@/components/ui/form'
 import CustomFormField, { FormButton } from '@/components/ui/CustomForm'
 import useBookingStore, { Booking } from '@/zustand/bookingStore'
-import { DrivingExperience, LessonPreferences, ReferredFrom } from '@/lib/enums'
+import { DrivingExperience, ReferredFrom } from '@/lib/enums'
 import { useRouter } from 'next/navigation'
-import getLessons from '@/actions/getLessons'
 import Message from '@/components/Message'
 import useLessonStore from '@/zustand/lessonStore'
 import bookLesson from '@/actions/bookLesson'
@@ -39,7 +38,7 @@ export default function CompleteDetails() {
     ...(step === 3 && {
       isPassedTheoryTest: z
         .string()
-        .min(1, { message: 'Theory test result is required' }),
+        .min(1, { message: 'Theory test is required' }),
       discountTest: z.string().optional(),
       passedTheoryDate: z.string().optional(),
       startDate: z.string().min(1, { message: 'Start date is required' }),
@@ -51,12 +50,15 @@ export default function CompleteDetails() {
         .min(1, { message: 'Driving experience is required' }),
     }),
     ...(step === 4 && {
-      referredFrom: z.string().min(1, { message: 'Referred from is required' }),
+      referredFrom: z
+        .string()
+        .min(1, { message: 'Where did you hear from is required' }),
       discountCode: z.string().optional(),
       fullName: z.string().min(1, { message: 'Full name is required' }),
-      contactNo: z.string().min(1, { message: 'Contact number is required' }),
       email: z.string().email().min(1, { message: 'Email is required' }),
       address: z.string().min(1, { message: 'Address is required' }),
+      address2: z.string().min(1, { message: 'Address2 is required' }),
+      town: z.string().min(1, { message: 'Town is required' }),
       licenseNo: z.string().min(1, { message: 'License number is required' }),
     }),
   })
@@ -169,21 +171,23 @@ export default function CompleteDetails() {
                       </>
                     )}
 
-                    <CustomFormField
-                      form={form}
-                      name='startDate'
-                      label='When would you like to start?'
-                      placeholder='When would you like to start?'
-                      type='date'
-                    />
+                    <div className='grid grid-cols-1 lg:grid-cols-2 gap-x-4'>
+                      <CustomFormField
+                        form={form}
+                        name='startDate'
+                        label='When would you like to start?'
+                        placeholder='When would you like to start?'
+                        type='date'
+                      />
 
-                    <CustomFormField
-                      form={form}
-                      name='practicalTestDate'
-                      label='Choose practical test date'
-                      placeholder='Choose practical test date'
-                      type='date'
-                    />
+                      <CustomFormField
+                        form={form}
+                        name='practicalTestDate'
+                        label='Choose practical test date'
+                        placeholder='Choose practical test date'
+                        type='date'
+                      />
+                    </div>
 
                     <CustomFormField
                       form={form}
@@ -198,57 +202,71 @@ export default function CompleteDetails() {
 
                 {step === 4 && (
                   <>
-                    <CustomFormField
-                      form={form}
-                      name='fullName'
-                      label='Full Name'
-                      placeholder='Full Name'
-                      type='text'
-                    />
-                    <CustomFormField
-                      form={form}
-                      name='contactNo'
-                      label='Contact Number'
-                      placeholder='Contact Number'
-                      type='number'
-                    />
-                    <CustomFormField
-                      form={form}
-                      name='email'
-                      label='Email'
-                      placeholder='Email'
-                      type='email'
-                    />
-                    <CustomFormField
-                      form={form}
-                      name='address'
-                      label='Address'
-                      placeholder='Address'
-                      type='text'
-                    />
-                    <CustomFormField
-                      form={form}
-                      name='licenseNo'
-                      label='License'
-                      placeholder='License'
-                      type='text'
-                    />
-                    <div className='bg-gray-100 p-3 rounded mb-3'>
+                    <div className='grid grid-cols-1 lg:grid-cols-2 gap-x-4'>
                       <CustomFormField
                         form={form}
-                        name='referredFrom'
-                        label='Referred From'
-                        placeholder='Referred From'
-                        fieldType='command'
-                        data={ReferredFrom}
-                      />
-                      <CustomFormField
-                        form={form}
-                        name='discountCode'
-                        label='Discount Code'
-                        placeholder='Discount Code'
+                        name='fullName'
+                        label='Full Name'
+                        placeholder='Full Name'
                         type='text'
                       />
+
+                      <CustomFormField
+                        form={form}
+                        name='email'
+                        label='Email'
+                        placeholder='Email'
+                        type='email'
+                      />
+                    </div>
+                    <div className='grid grid-cols-1 lg:grid-cols-2 gap-x-4'>
+                      <CustomFormField
+                        form={form}
+                        name='licenseNo'
+                        label='License'
+                        placeholder='License'
+                        type='text'
+                      />
+                      <CustomFormField
+                        form={form}
+                        name='address'
+                        label='Address Line 1'
+                        placeholder='Address Line 1'
+                        type='text'
+                      />
+                      <CustomFormField
+                        form={form}
+                        name='town'
+                        label='Town'
+                        placeholder='Town'
+                        type='text'
+                      />
+                      <CustomFormField
+                        form={form}
+                        name='address2'
+                        label='Address Line 2'
+                        placeholder='Address Line 2'
+                        type='text'
+                      />
+                    </div>
+                    <div className='bg-gray-100 p-3 rounded mb-3'>
+                      <div className='grid grid-cols-1 lg:grid-cols-2 gap-x-4'>
+                        <CustomFormField
+                          form={form}
+                          name='referredFrom'
+                          label='How did you hear about us?'
+                          placeholder='Referred From'
+                          fieldType='command'
+                          data={ReferredFrom}
+                        />
+                        <CustomFormField
+                          form={form}
+                          name='discountCode'
+                          label='Discount Code'
+                          placeholder='Discount Code'
+                          type='text'
+                        />
+                      </div>
                     </div>
                   </>
                 )}

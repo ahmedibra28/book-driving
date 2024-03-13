@@ -180,24 +180,26 @@ export default function Header() {
 
                 {step === 2 && (
                   <>
-                    <CustomFormField
-                      form={form}
-                      name='lessonType'
-                      label='Lesson Type'
-                      placeholder='Lesson Type'
-                      fieldType='command'
-                      data={lessonTypes}
-                      labelTextColor='text-white'
-                    />
-                    <CustomFormField
-                      form={form}
-                      name='transmissionType'
-                      label='Transmission Type'
-                      placeholder='Transmission Type'
-                      fieldType='command'
-                      data={transmissionTypes}
-                      labelTextColor='text-white'
-                    />
+                    <div className='grid grid-cols-1 lg:grid-cols-2 gap-x-4'>
+                      <CustomFormField
+                        form={form}
+                        name='lessonType'
+                        label='Lesson Type'
+                        placeholder='Lesson Type'
+                        fieldType='command'
+                        data={lessonTypes}
+                        labelTextColor='text-white'
+                      />
+                      <CustomFormField
+                        form={form}
+                        name='transmissionType'
+                        label='Transmission Type'
+                        placeholder='Transmission Type'
+                        fieldType='command'
+                        data={transmissionTypes}
+                        labelTextColor='text-white'
+                      />
+                    </div>
                     <MultiSelect
                       form={form}
                       name='lessonPreferences'

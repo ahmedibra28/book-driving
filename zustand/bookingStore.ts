@@ -28,9 +28,10 @@ export type Booking = {
   referredFrom?: string
   discountCode?: string
   fullName?: string
-  contactNo?: string
   email?: string
   address?: string
+  address2?: string
+  town?: string
   licenseNo?: string
 }
 
@@ -70,9 +71,10 @@ const useBookingStore = create<BookingStore>((set) => ({
     referredFrom: '',
     discountCode: '',
     fullName: '',
-    contactNo: '',
     email: '',
     address: '',
+    address2: '',
+    town: '',
     licenseNo: '',
   },
   step: 1,
@@ -120,9 +122,10 @@ const useBookingStore = create<BookingStore>((set) => ({
         referredFrom: '',
         discountCode: '',
         fullName: '',
-        contactNo: '',
         email: '',
         address: '',
+        address2: '',
+        town: '',
         licenseNo: '',
       },
     }))

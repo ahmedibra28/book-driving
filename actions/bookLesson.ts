@@ -7,42 +7,24 @@ import type {
   ReferredFrom as IReferredForm,
 } from '@prisma/client'
 
-// {
-//   "postalCode": "BN02010",
-//   "mobile": "6155555551",
-//   "lessonType": "INTENSIVELY",
-//   "transmissionType": "AUTOMATIC",
-//   "fastTrackedTheoryTest": true,
-//   "fastTrackedDriveTest": true,
-//   "ultimateTheoryPackage": true,
-//   "lessonPreferences": [
-//       "WEEKDAY_MORNINGS"
-//   ],
-//   "previousDrivingExperience": "I_HAVE_COMPLETED_1_TO_10_HOURS_OF_LESSONS",
-//   "lessonId": "APLpD__Nq4KKtDNYQ_cM1",
-//   "isPassedTheoryTest": "false",
-//   "discountTest": "false",
-//   "passedTheoryDate": "",
-//   "startDate": "2024-03-21",
-//   "practicalTestDate": "2024-04-01",
-//   "drivingExperience": "I_HAVE_HAD_15_TO_19_DRIVING_LESSONS",
-//   "referredFrom": "FACEBOOK",
-//   "discountCode": "123",
-//   "fullName": "Ahmed Ibrahim Samow",
-//   "contactNo": "615301507",
-//   "email": "ahmaat19@gmail.com",
-//   "address": "Makkah Almukaramah",
-//   "licenseNo": "nn"
-// }
+import { render } from '@react-email/render'
+import { handleEmailFire } from '@/lib/email-helper'
+import Notification from '@/emails/Notification'
+
+import { NewCourseBookingNotification } from '@/components/NotificationEmail'
+import { WordCapitalize } from '@/lib/capitalize'
 
 export default async function bookLesson(props: Booking) {
   if (
     !props?.lessonType ||
     !props?.previousDrivingExperience ||
     !props?.lessonId ||
-    !props?.contactNo ||
     !props?.fullName ||
+    !props?.mobile ||
     !props?.address ||
+    !props?.address2 ||
+    !props?.town ||
+    !props?.postalCode ||
     !props?.licenseNo ||
     !props?.email
   )
@@ -60,9 +42,12 @@ export default async function bookLesson(props: Booking) {
     const student = await prisma.student.create({
       data: {
         fullName: props?.fullName!,
-        contactNo: props?.contactNo!,
+        contactNo: `${props?.mobile}`,
         email: props?.email!,
         address: props?.address!,
+        address2: props?.address2!,
+        town: props?.town!,
+        postalCode: props?.postalCode!,
         licenseNo: props?.licenseNo!,
       },
     })
@@ -73,7 +58,9 @@ export default async function bookLesson(props: Booking) {
       data: {
         lessonId: props?.lessonId!,
         isPassedTheoryTest: props?.isPassedTheoryTest === 'true',
-        passedTheoryDate: new Date(props?.passedTheoryDate || ''),
+        ...(props?.passedTheoryDate && {
+          passedTheoryDate: new Date(props?.passedTheoryDate),
+        }),
         discountTest: props?.discountTest === 'true' ? 5 : 0,
         startDate: new Date(props?.startDate || ''),
         practicalTestDate: new Date(props?.practicalTestDate || ''),
@@ -89,6 +76,20 @@ export default async function bookLesson(props: Booking) {
     if (!transaction) throw new Error('Transaction not created')
 
     return transaction
+  })
+
+  await handleEmailFire({
+    to: props?.email,
+    subject: `${WordCapitalize(props?.lessonType)} Course Booking Notification`,
+    html: render(
+      Notification({
+        company: 'Book Driving',
+        message: NewCourseBookingNotification({
+          lessonName: WordCapitalize(props?.lessonType),
+        }),
+        recipient: `Dear ${props?.fullName},`,
+      })
+    ),
   })
 
   return transaction

@@ -6,26 +6,21 @@ import {
   Html,
   Preview,
   Text,
+  Img,
   Tailwind,
 } from '@react-email/components'
 import * as React from 'react'
 
 interface NotificationProps {
   company: string
-  token: string
-  clientName: string
-  osName: string
-  ip: string
-  baseUrl: string
+  message: any
+  recipient: string
 }
 
 export const Notification = ({
   company,
-  token,
-  clientName,
-  osName,
-  ip,
-  baseUrl,
+  message,
+  recipient,
 }: NotificationProps) => (
   <Tailwind
     config={{
@@ -44,20 +39,12 @@ export const Notification = ({
       <Body className='bg-white'>
         <Container className='px-3 mx-auto font-sans'>
           <Heading className='text-2xl font-bold text-black my-7'>
-            Hello Ahmed,
+            {recipient}
           </Heading>
 
-          <Container className='bg-orange-300 p-4 rounded-xl mb-3'>
-            <Text className='font-bold'>
-              Subject: New Driving Course Booking
-            </Text>
-            <Text className='mb-4 text-gray-700'>
-              A new course has been booked by John Doe for lessons starting July
-              15. Click here to view booking details.
-            </Text>
-          </Container>
+          {message}
 
-          <Container className='bg-orange-300 p-4 rounded-xl mb-3'>
+          {/* <Container className='bg-orange-300 p-4 rounded-xl mb-3'>
             <Text className='font-bold'>Subject: Course Request</Text>
             <Text className='mb-4 text-gray-700'>
               You have a new course request from John Doe for lessons starting
@@ -82,14 +69,19 @@ export const Notification = ({
               July 15 has been confirmed. Please contact Jane to arrange your
               first lesson.
             </Text>
-          </Container>
+          </Container> */}
+
+          <Img
+            height='32'
+            src={`https://github.com/ahmedibra28.png`}
+            width='32'
+            alt={`${company}'s Logo`}
+          />
 
           <Text className='text-gray-400 text-xs mt-3 mb-6'>
-            If you’re having trouble with the button above, copy and paste the
-            URL below into your web browser. <br />
-            <a href={baseUrl + '/auth/verification/' + token}>
-              {baseUrl}/auth/verification/{token}
-            </a>
+            Thanks,
+            <br />
+            <strong>{company}</strong>
           </Text>
         </Container>
       </Body>

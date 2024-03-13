@@ -131,6 +131,14 @@ const clientPermissions = [
     sort: sort.normal,
     description: 'Lesson page',
   },
+  {
+    id: 'Yu9Dl2ZN-Nra2_iNL9vV8',
+    name: 'Order',
+    path: '/order',
+    menu: 'normal',
+    sort: sort.normal,
+    description: 'Order page',
+  },
 ]
 
 const permissions = [
@@ -365,6 +373,15 @@ const permissions = [
     route: '/api/lessons/:id',
     name: 'Lessons',
     method: 'DELETE',
+  },
+
+  //   Order
+  {
+    id: '4IDmkHb9FngwBuXKqmXFP',
+    description: 'Orders',
+    route: '/api/orders',
+    name: 'Orders',
+    method: 'GET',
   },
 ]
 
