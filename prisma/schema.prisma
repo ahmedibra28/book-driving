@@ -171,6 +171,9 @@ model Transaction {
   instructor   User?   @relation(fields: [instructorId], references: [id], onDelete: Restrict)
   instructorId String? @unique
 
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   @@map("transactions")
 }
 
@@ -229,6 +232,5 @@ enum InstructorStatus {
 enum Status {
   ACTIVE
   INACTIVE
-  DELETED
   PENDING
 }

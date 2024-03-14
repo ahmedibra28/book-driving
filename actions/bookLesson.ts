@@ -47,7 +47,7 @@ export default async function bookLesson(props: Booking) {
         address: props?.address!,
         address2: props?.address2!,
         town: props?.town!,
-        postalCode: props?.postalCode!,
+        postalCode: props?.postalCode?.toUpperCase()!,
         licenseNo: props?.licenseNo!,
       },
     })

@@ -139,6 +139,14 @@ const clientPermissions = [
     sort: sort.normal,
     description: 'Order page',
   },
+  {
+    id: 'HnCMgsl74kcTRYlJGsOC4',
+    name: 'Order Details',
+    path: '/order/[id]',
+    menu: 'hidden',
+    sort: sort.hidden,
+    description: 'Order details page',
+  },
 ]
 
 const permissions = [
@@ -381,6 +389,13 @@ const permissions = [
     description: 'Orders',
     route: '/api/orders',
     name: 'Orders',
+    method: 'GET',
+  },
+  {
+    id: 'HRu69jNp0m4mJXs_cjCQ5',
+    description: 'Order details',
+    route: '/api/orders/:id',
+    name: 'Order',
     method: 'GET',
   },
 ]

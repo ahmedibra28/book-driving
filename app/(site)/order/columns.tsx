@@ -1,3 +1,4 @@
+import { FormatNumber } from '@/components/FormatNumber'
 import DateTime from '@/lib/dateTime'
 import Link from 'next/link'
 
@@ -8,15 +9,62 @@ export const columns = () => {
       accessorKey: 'fullName',
       active: true,
       cell: ({ row: { original } }: any) => (
-        <Link className='underline' href={`/instructors/${original?.id}`}>
-          {original?.fullName}
+        <Link className='underline' href={`/order/${original?.id}`}>
+          {original?.student?.fullName}
         </Link>
       ),
     },
-    { header: 'Email', accessorKey: 'email', active: true },
-    { header: 'Mobile', accessorKey: 'contactNo', active: true },
-    { header: 'Postal Code', accessorKey: 'postalCode', active: true },
-    { header: 'License No', accessorKey: 'drivingLicenseNo', active: true },
+    {
+      header: 'Email',
+      accessorKey: 'email',
+      active: true,
+      cell: ({ row: { original } }: any) => original?.student?.email,
+    },
+    {
+      header: 'Mobile',
+      accessorKey: 'contactNo',
+      active: true,
+      cell: ({ row: { original } }: any) => original?.student?.contactNo,
+    },
+    {
+      header: 'Postal Code',
+      accessorKey: 'postalCode',
+      active: true,
+      cell: ({ row: { original } }: any) => original?.student?.postalCode,
+    },
+    {
+      header: 'Town',
+      accessorKey: 'town',
+      active: false,
+      cell: ({ row: { original } }: any) => original?.student?.town,
+    },
+    {
+      header: 'Lesson',
+      accessorKey: 'lesson.lessonType',
+      active: true,
+      cell: ({ row: { original } }: any) => original?.lesson?.lessonType,
+    },
+    {
+      header: 'Hours',
+      accessorKey: 'lesson.hours',
+      active: true,
+      cell: ({ row: { original } }: any) => original?.lesson?.hours,
+    },
+    {
+      header: 'Start Date',
+      accessorKey: 'startDate',
+      active: true,
+      cell: ({ row: { original } }: any) =>
+        DateTime(original?.startDate).format('DD-MM-YYYY'),
+    },
+    {
+      header: 'Amount',
+      accessorKey: 'amount',
+      active: true,
+      cell: ({ row: { original } }: any) => (
+        <FormatNumber value={original?.amount} />
+      ),
+    },
     {
       header: 'Status',
       accessorKey: 'status',

@@ -27,9 +27,9 @@ const Page = () => {
   }, [path, router])
 
   const getApi = useApi({
-    key: ['instructors'],
+    key: ['orders'],
     method: 'GET',
-    url: `instructors?page=${page}&q=${q}&limit=${limit}`,
+    url: `orders?page=${page}&q=${q}&limit=${limit}`,
   })?.get
 
   useEffect(() => {
@@ -72,7 +72,7 @@ const Page = () => {
             q={q}
             setQ={setQ}
             searchHandler={searchHandler}
-            caption='Instructors List'
+            caption='Orders List'
             hasAdd={false}
           />
         </div>
