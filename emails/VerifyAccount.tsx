@@ -77,8 +77,8 @@ export const VerifyAccount = ({
             </strong>{' '}
             <br />
             For security, this request was received from {ip} a {osName} device
-            using {clientName}. If you did not request a password reset, please
-            ignore this email.
+            using {clientName}. If you did not request, please ignore this
+            email.
           </Text>
 
           <Img

@@ -35,7 +35,7 @@ export const Notification = ({
   >
     <Html>
       <Head />
-      <Preview>Hello Ahmed,</Preview>
+      <Preview>{recipient}</Preview>
       <Body className='bg-white'>
         <Container className='px-3 mx-auto font-sans'>
           <Heading className='text-2xl font-bold text-black my-7'>

@@ -398,6 +398,13 @@ const permissions = [
     name: 'Order',
     method: 'GET',
   },
+  {
+    id: 'HRu69jNp0m4mJXsMcjCQ5',
+    description: 'Send order to instructors',
+    route: '/api/orders/:id',
+    name: 'Order',
+    method: 'PUT',
+  },
 ]
 
 export { roles, users, profile, permissions, clientPermissions }

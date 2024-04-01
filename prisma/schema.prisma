@@ -233,4 +233,5 @@ enum Status {
   ACTIVE
   INACTIVE
   PENDING
+  EMAIL_SENT
 }

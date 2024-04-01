@@ -43,3 +43,43 @@ export const NewCourseBookingNotification = ({
     </Container>
   )
 }
+
+export const InstructorCourseOfferNotification = ({
+  link,
+  company,
+}: {
+  link: string
+  company: string
+}) => {
+  return (
+    <Container className='rounded-xl mb-3'>
+      <Text className='mb-4 text-gray-700'>
+        We have an open driving course available and believe you would be a
+        great fit as the instructor. If you&apos;re interested, please complete
+        your instructor profile and indicate your availability using the link
+        below:
+      </Text>
+      <a
+        href={`http://localhost:3000` + link}
+        target='_blank'
+        className='bg-blue-500 text-white font-bold py-2 px-4 rounded cursor-pointer no-underline'
+      >
+        Click here to setup your profile
+      </a>
+      <Text className='mb-4 text-gray-700'>
+        Once your profile is complete, we will provide you with the
+        student&apos;s details. You can then connect with them and plan the
+        lessons accordingly.
+      </Text>
+      <Text className='mb-4 text-gray-700'>
+        We value your expertise and commitment to providing excellent
+        instruction. Join us in shaping skilled and confident drivers.
+      </Text>
+      <Text className='text-gray-400 text-xs mt-3 mb-6'>
+        Best regards,
+        <br />
+        <strong>{company}</strong>
+      </Text>
+    </Container>
+  )
+}

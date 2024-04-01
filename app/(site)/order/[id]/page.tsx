@@ -29,15 +29,25 @@ import * as z from 'zod'
 import { Form } from '@/components/ui/form'
 import CustomFormField from '@/components/ui/CustomForm'
 import useDataStore from '@/zustand/dataStore'
-import { useForm } from 'react-hook-form'
+import { useFieldArray, useForm } from 'react-hook-form'
 import FormView from '@/components/FormView'
 import { WordCapitalize } from '@/lib/capitalize'
 import { FormatNumber } from '@/components/FormatNumber'
+import { FaX } from 'react-icons/fa6'
+import { FaPlus } from 'react-icons/fa'
 
 const FormSchema = z.object({
-  note: z.string().refine((value) => value !== '', {
-    message: 'Note is required',
-  }),
+  instructors: z
+    .array(
+      z.object({
+        file: z.any(),
+        email: z
+          .string()
+          .email()
+          .min(1, { message: 'Instructor email is required' }),
+      })
+    )
+    .nonempty({ message: 'Instructor email is required' }),
 })
 
 const Page = ({ params }: { params: { id: string } }) => {
@@ -64,15 +74,6 @@ const Page = ({ params }: { params: { id: string } }) => {
     url: `orders`,
   })?.put
 
-  useEffect(() => {
-    if (updateApi?.isSuccess) {
-      getApi?.refetch()
-      setDialogOpen(false)
-    }
-
-    // eslint-disable-next-line
-  }, [updateApi?.isSuccess])
-
   const data = getApi?.data as ITransaction & {
     student: IStudent
     lesson: ILesson
@@ -82,8 +83,17 @@ const Page = ({ params }: { params: { id: string } }) => {
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
-      note: '',
+      instructors: [
+        {
+          email: '',
+        },
+      ],
     },
+  })
+
+  const formArray = useFieldArray({
+    name: 'instructors',
+    control: form.control,
   })
 
   useEffect(() => {
@@ -93,23 +103,62 @@ const Page = ({ params }: { params: { id: string } }) => {
     // eslint-disable-next-line
   }, [dialogOpen])
 
+  useEffect(() => {
+    if (updateApi?.isSuccess) {
+      getApi?.refetch()
+      form.reset()
+      setDialogOpen(false)
+    }
+
+    // eslint-disable-next-line
+  }, [updateApi?.isSuccess])
+
   const formFields = (
     <Form {...form}>
-      <CustomFormField
-        form={form}
-        name='note'
-        label='Note'
-        placeholder='Note'
-        cols={6}
-        rows={3}
-      />
+      {formArray.fields.map((field, index) => (
+        <div
+          key={field.id}
+          className='flex justify-between items-center gap-x-2'
+        >
+          <div className='w-full'>
+            <CustomFormField
+              form={form}
+              name={`instructors.${index}.email`}
+              placeholder='Email'
+              type='text'
+            />
+          </div>
+          <Button
+            type='button'
+            variant='destructive'
+            onClick={() => formArray.remove(index)}
+            size='sm'
+            className='size-9 mb-3'
+          >
+            <FaX />
+          </Button>
+          {index === formArray.fields.length - 1 && (
+            <Button
+              type='button'
+              onClick={() => formArray.append({ email: '' })}
+              className='gap-x-1 mb-3'
+              size='sm'
+            >
+              <FaPlus /> Append
+            </Button>
+          )}
+        </div>
+      ))}
     </Form>
   )
 
   const onSubmit = (values: z.infer<typeof FormSchema>) => {
+    console.log({
+      id: params.id,
+      ...values,
+    })
     updateApi?.mutateAsync({
       id: params.id,
-      status: 'REJECTED',
       ...values,
     })
   }
@@ -126,7 +175,7 @@ const Page = ({ params }: { params: { id: string } }) => {
         loading={updateApi?.isPending}
         handleSubmit={form.handleSubmit}
         submitHandler={onSubmit}
-        label={'Reject'}
+        label={'Instructors'}
         edit={false}
       />
 
@@ -249,6 +298,10 @@ const Page = ({ params }: { params: { id: string } }) => {
                       <span className='text-green-500'>{data?.status}</span>
                     ) : data?.status === 'PENDING' ? (
                       <span className='text-blue-500'>{data?.status}</span>
+                    ) : data?.status === 'EMAIL_SENT' ? (
+                      <span className='text-orange-500'>
+                        {data?.status?.replace('_', ' ')}
+                      </span>
                     ) : (
                       <span className='text-red-500'>{data?.status}</span>
                     )}
@@ -310,12 +363,15 @@ const Page = ({ params }: { params: { id: string } }) => {
                   Refund
                 </Button>
               )}
-              {data?.status === 'PENDING' && (
+              {(data?.status === 'PENDING' ||
+                data?.status === 'EMAIL_SENT') && (
                 <Button
-                  onClick={() => console.log('fetching...')}
-                  className='w-full md:w-1/3'
+                  onClick={() => setDialogOpen(true)}
+                  className='w-full md:w-1/2'
                 >
-                  Find Instructor
+                  {data?.status === 'EMAIL_SENT'
+                    ? ' Resend To Email'
+                    : ' Send To Email'}
                 </Button>
               )}
             </CardFooter>
