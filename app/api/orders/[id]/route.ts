@@ -75,6 +75,7 @@ export async function PUT(req: Request, { params }: Params) {
       where: { id: params.id },
       data: {
         status: 'EMAIL_SENT',
+        invitations: instructors?.map((item) => item.email),
       },
     })
 

@@ -147,6 +147,22 @@ const clientPermissions = [
     sort: sort.hidden,
     description: 'Order details page',
   },
+  {
+    id: 'HnCMgsl74kcTRYlJGsOC7',
+    name: 'My Courses',
+    path: '/course',
+    menu: 'normal',
+    sort: sort.normal,
+    description: 'My courses page',
+  },
+  {
+    id: 'HnCMgsl74ksTRYlJGsOC7',
+    name: 'My Courses Details',
+    path: '/course/[id]',
+    menu: 'hidden',
+    sort: sort.hidden,
+    description: 'My courses details page',
+  },
 ]
 
 const permissions = [

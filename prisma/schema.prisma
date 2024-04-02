@@ -163,6 +163,7 @@ model Transaction {
   discountCode       String?
   amount             Float
   status             Status            @default(ACTIVE)
+  invitations        String[]
 
   student      Student @relation(fields: [studentId], references: [id], onDelete: Restrict)
   studentId    String  @unique
