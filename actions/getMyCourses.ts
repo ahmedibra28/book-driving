@@ -7,13 +7,26 @@ export default async function getMyCourses(instructorEmail: string) {
 
   const orders = await prisma.transaction.findMany({
     where: {
-      status: 'EMAIL_SENT',
+      status: {
+        in: ['ACTIVE', 'EMAIL_SENT'],
+      },
       invitations: {
-        equals: [instructorEmail],
+        has: instructorEmail,
       },
     },
     include: {
       lesson: true,
+      student: {
+        select: {
+          id: true,
+          fullName: true,
+          contactNo: true,
+          email: true,
+          postalCode: true,
+          address: true,
+          town: true,
+        },
+      },
     },
     take: 50,
   })

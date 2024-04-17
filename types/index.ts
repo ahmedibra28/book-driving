@@ -34,4 +34,13 @@ export type MyCourseProp = {
     createdAt: Date
     createdById: string
   }
+  student?: {
+    id: string
+    fullName: string
+    contactNo: string
+    email: string
+    postalCode: string
+    address: string
+    town: string | null
+  }
 }

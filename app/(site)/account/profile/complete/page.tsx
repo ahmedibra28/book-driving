@@ -136,10 +136,10 @@ const Profile = () => {
   const status = profile?.instructor?.status
 
   useEffect(() => {
-    if (getApi?.isSuccess && userInfo.role === 'INSTRUCTOR') {
+    if (userInfo.role === 'INSTRUCTOR') {
       if (['APPROVED', 'PENDING'].includes(status)) {
         setTimeout(() => {
-          router.push('/')
+          router.push('/course')
         }, 3000)
       }
     }
