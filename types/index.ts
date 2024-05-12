@@ -44,3 +44,60 @@ export type MyCourseProp = {
     town: string | null
   }
 }
+
+export type SquarePaymentResponse = {
+  id: string
+  createdAt: string
+  updatedAt: string
+  amountMoney: {
+    amount: string
+    currency: string
+  }
+  totalMoney: {
+    amount: string
+    currency: string
+  }
+  approvedMoney: {
+    amount: string
+    currency: string
+  }
+  status: string
+  delayDuration: string
+  delayAction: string
+  delayedUntil: string
+  sourceType: string
+  cardDetails: {
+    status: string
+    card: {
+      cardBrand: string
+      last4: string
+      expMonth: string
+      expYear: string
+      fingerprint: string
+      cardType: string
+      prepaidType: string
+      bin: string
+    }
+    entryMethod: string
+    cvvStatus: string
+    avsStatus: string
+    statementDescription: string
+    cardPaymentTimeline: {
+      authorizedAt: string
+      capturedAt: string
+    }
+  }
+  locationId: string
+  orderId: string
+  riskEvaluation: {
+    createdAt: string
+    riskLevel: string
+  }
+  receiptNumber: string
+  receiptUrl: string
+  applicationDetails: {
+    squareProduct: string
+    applicationId: string
+  }
+  versionToken: string
+}

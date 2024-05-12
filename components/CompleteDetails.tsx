@@ -19,6 +19,9 @@ import { useRouter } from 'next/navigation'
 import Message from '@/components/Message'
 import useLessonStore from '@/zustand/lessonStore'
 import bookLesson from '@/actions/bookLesson'
+import { CreditCard, PaymentForm } from 'react-square-web-payments-sdk'
+import { submitPayment } from '@/actions/payment'
+import { SquarePaymentResponse } from '@/types'
 
 export default function CompleteDetails() {
   const {
@@ -28,6 +31,8 @@ export default function CompleteDetails() {
     setStep,
     reset: resetBooking,
   } = useBookingStore((state) => state)
+  const { lessons } = useLessonStore((state) => state)
+  const selectedLesson = lessons?.find((item) => item.id === booking?.lessonId)
   const { reset: resetLesson } = useLessonStore((state) => state)
   const [error, setError] = useState<string | null>(null)
 
@@ -92,7 +97,13 @@ export default function CompleteDetails() {
     }
 
     if (step === 4) {
+      setStep(step + 1)
       setBooking(values as any)
+    }
+
+    if (step === 5) {
+      console.log({ booking })
+      console.log({ selectedLesson })
       handleCheckout({ ...booking, ...values } as Booking)
     }
   }
@@ -127,7 +138,7 @@ export default function CompleteDetails() {
             <CardDescription>
               Please fill out your details below to complete your booking
             </CardDescription>
-            <CardDescription>(Step {step} / 4)</CardDescription>
+            <CardDescription>(Step {step} / 5)</CardDescription>
           </CardHeader>
           <CardContent className='text-start'>
             <form
@@ -271,15 +282,47 @@ export default function CompleteDetails() {
                   </>
                 )}
 
+                {step === 5 && (
+                  <div className='grid grid-cols-1 gap-x-4 p-4'>
+                    <PaymentForm
+                      applicationId={
+                        process.env.NEXT_PUBLIC_SQUARE_APP_ID as string
+                      }
+                      locationId={
+                        process.env.NEXT_PUBLIC_SQUARE_LOCATION_ID as string
+                      }
+                      cardTokenizeResponseReceived={async (token) => {
+                        const result = (await submitPayment({
+                          sourceId: `${token.token}`,
+                          amount: selectedLesson?.deposit || 0,
+                        })) as SquarePaymentResponse
+
+                        if (result.status === 'COMPLETED') {
+                          const submitBtn =
+                            document.querySelector('.submit-button')
+
+                          submitBtn?.click()
+                        }
+                      }}
+                    >
+                      <CreditCard />
+                    </PaymentForm>
+                  </div>
+                )}
+
                 <div className='space-x-5 text-center'>
                   <FormButton
                     loading={isPending}
                     label='Back'
                     type='button'
-                    className='w-32'
+                    className={` ${
+                      step === 5
+                        ? 'w-[95%] mx-auto bg-background border-red-500 border text-red-500 hover:text-white'
+                        : 'w-32'
+                    }`}
                     variant='destructive'
                     onClick={() => {
-                      if (step === 3) {
+                      if (step === 4) {
                         router.back()
                       }
                       setStep(step - 1)
@@ -288,9 +331,11 @@ export default function CompleteDetails() {
                   />
                   <FormButton
                     loading={isPending}
-                    label={step === 4 ? 'Checkout' : 'Next'}
+                    label={step === 5 ? 'Checkout' : 'Next'}
                     type='submit'
-                    className='w-32'
+                    className={`w-32 submit-button ${
+                      step === 5 ? 'hidden' : ''
+                    }`}
                     variant='outline'
                   />
                 </div>

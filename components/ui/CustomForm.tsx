@@ -113,6 +113,7 @@ export default function CustomFormField({
 }: FormProps) {
   const [search, setSearch] = React.useState('')
   const [data, setData] = React.useState(props?.data)
+  const [open, setOpen] = React.useState(false)
 
   const getData = useApi({
     key: [props?.key!, props?.url!],
@@ -207,12 +208,13 @@ export default function CustomFormField({
             <FormLabel className={`${labelTextColor}`}>{label}</FormLabel>
 
             {props?.fieldType === 'command' ? (
-              <Popover>
+              <Popover open={open} onOpenChange={setOpen}>
                 <PopoverTrigger asChild>
                   <FormControl>
                     <Button
                       variant='outline'
                       role='combobox'
+                      aria-expanded={open}
                       className={cn(
                         'w-full justify-between',
                         !field.value && 'text-muted-foreground'
@@ -244,6 +246,7 @@ export default function CustomFormField({
                           key={item.value}
                           onSelect={() => {
                             form.setValue(name, item.value)
+                            setOpen(false)
                           }}
                         >
                           {item.label}
