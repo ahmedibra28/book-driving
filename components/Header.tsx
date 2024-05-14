@@ -148,7 +148,7 @@ export default function Header() {
                 : 'Please fill out the form below to book a driving lesson'}
             </CardDescription>
             <CardDescription className='text-gray-200'>
-              (Step {step} / 4)
+              (Step {step} / 5)
             </CardDescription>
           </CardHeader>
           <CardContent className='text-start'>

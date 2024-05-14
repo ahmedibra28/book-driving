@@ -33,6 +33,8 @@ export type Booking = {
   address2?: string
   town?: string
   licenseNo?: string
+
+  status?: string
 }
 
 type BookingStore = {

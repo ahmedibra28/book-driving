@@ -21,7 +21,7 @@ import useLessonStore from '@/zustand/lessonStore'
 import bookLesson from '@/actions/bookLesson'
 import { CreditCard, PaymentForm } from 'react-square-web-payments-sdk'
 import { submitPayment } from '@/actions/payment'
-import { SquarePaymentResponse } from '@/types'
+import { CreatePaymentResponse } from 'square'
 
 export default function CompleteDetails() {
   const {
@@ -295,13 +295,21 @@ export default function CompleteDetails() {
                         const result = (await submitPayment({
                           sourceId: `${token.token}`,
                           amount: selectedLesson?.deposit || 0,
-                        })) as SquarePaymentResponse
+                        })) as CreatePaymentResponse
 
-                        if (result.status === 'COMPLETED') {
+                        if (result?.payment?.status === 'COMPLETED') {
                           const submitBtn =
                             document.querySelector('.submit-button')
 
                           submitBtn?.click()
+                        } else {
+                          setError(
+                            result?.errors?.[0]?.detail ||
+                              'Something went wrong, please try again later'
+                          )
+                          setTimeout(() => {
+                            setError(null)
+                          }, 5000)
                         }
                       }}
                     >
@@ -322,7 +330,7 @@ export default function CompleteDetails() {
                     }`}
                     variant='destructive'
                     onClick={() => {
-                      if (step === 4) {
+                      if (step === 3) {
                         router.back()
                       }
                       setStep(step - 1)

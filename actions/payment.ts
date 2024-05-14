@@ -28,6 +28,7 @@ export async function submitPayment({
         amount,
       },
     })
+
     return result
   } catch (error) {
     console.log('error: ', error?.errors)
